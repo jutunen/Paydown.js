@@ -1,5 +1,5 @@
 # Paydown.js
-Yet another loan payment calculator.
+Yet another loan payment calculation library.
 ## Features
 - freely selectable calculation period
 - daily interest calculation
