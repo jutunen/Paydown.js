@@ -1,4 +1,5 @@
 # Paydown.js
+Yet another loan payment calculator.
 ## Features
 - freely selectable calculation period
 - daily interest calculation
@@ -213,3 +214,11 @@ If Paydown.calculate method is provided with an array as its 3rd argument, the a
 - loan term features
 - "interests only" payment method
 - etc.
+
+## Contributing
+Contributions are welcome.
+
+## License
+Copyright (c) 2019 Jussi Utunen
+
+Licensed under the MIT License
