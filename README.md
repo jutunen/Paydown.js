@@ -139,3 +139,39 @@ console.log(JSON.stringify(rval_obj));
     "remaining_principal":89902.55,
     "days_calculated":181,
     "actual_end_date":"30.6.2019"}
+
+## Documentation
+
+#### Invoking the calculation
+
+Paydown.calculate(init_data, events, payments)
+
+#### Method arguments
+
+Argument|Direction|Type|Optional|Description
+--------|---------|----|--------|-----------
+init_data|input|object|no|Initial calculation values
+events|input|array of objects|yes|List of changes during calculation period
+payments|output|array|yes|List of individual payments
+
+#### Init_data properties
+
+Name|Type|Optional|Description|Format / Values|Default value
+----|----|--------|-----------|---------------|-------------
+start_date|string|no|Calculation start date|"dd.mm.yyyy"
+end_date|string|no|Calculation end date|"dd.mm.yyyy"
+principal|number|no|Principal amount at the start date|
+rate|number|no|Interest rate at the start date|
+day_count_method|string|yes|Determines how interest accrues over time|"act/360"<br>"act/365"|"act/360"
+payment_method|string|yes|Sets payment method for recurring payments|"equal_installment"<br>"equal_reduction"|"equal_installment"
+round_values|boolean|yes|Sets output value rounding to 2 decimals|true<br>false|true
+include_unpaid_interest|boolean|yes|Determines whether final "loose" interests shall be added to the total sum of interests|true<br>false|true
+recurring|object|yes|Defines recurring payments|See below|
+
+#### Recurring properties
+
+Name|Type|Optional|Description|Format / Values
+----|----|--------|-----------|---------------
+amount|number|no|The amount of recurring payment|
+first_payment_date|string|no|First recurring payment date|"dd.mm.yyyy"
+payment_day|number|no|Monthly payment day of the recurring payment, applied after the month of the first payment date|1 - 31<br>31 equals to the last day of the month
