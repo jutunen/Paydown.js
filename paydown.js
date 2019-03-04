@@ -496,7 +496,7 @@ function _Paydown () {
     this.event_array.sort(event_array_sorter)
 
     for (var index = 0; index < this.event_array.length - 1; index++) {
-      if (this.event_array[index].date === this.event_array[index + 1].date) {
+      if (date_to_integer(this.event_array[index].date) === date_to_integer(this.event_array[index + 1].date)) {
         // todo: here it should be checked that date property is the only common thing that the events to be merged share
         Object.assign(this.event_array[index], this.event_array[index + 1])
         this.event_array.splice(index + 1, 1)
