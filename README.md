@@ -194,7 +194,7 @@ Paydown.calculate method returns an object with following properties:
 Name|Description
 ----|-----------
 sum_of_interests|Sum of accrued interests during calculation period
-sum_of_reductions|Total amount of the interest reduction during calculation period
+sum_of_reductions|Total amount of the principal reduction during calculation period
 sum_of_installments|Total sum of interests and reductions during calculation period
 remaining_principal|Remaining principal after calculation end date
 days_calculated|Number of days in the calculation period
