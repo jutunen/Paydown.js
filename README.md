@@ -142,7 +142,7 @@ console.log(JSON.stringify(rval_obj));
 
 ## Documentation
 
-#### Invoking the calculation
+### Invoking the calculation
 
 Paydown.calculate(init_data, events, payments)
 
@@ -175,3 +175,41 @@ Name|Type|Optional|Description|Format / Values
 amount|number|no|The amount of recurring payment|
 first_payment_date|string|no|First recurring payment date|"dd.mm.yyyy"
 payment_day|number|no|Monthly payment day of the recurring payment, applied after the month of the first payment date|1 - 31<br>31 equals to the last day of the month
+
+#### Event object properties
+
+Name|Type|Optional|Description|Format / Values
+----|----|--------|-----------|---------------
+date|string|no|Event date|"dd.mm.yyyy"
+rate|number|yes|New interest rate|
+recurring_amount|number|yes|New recurring payment amount|
+pay_installment|number|yes|Individual installment payment|
+pay_reduction|number|yes|Individual principal reduction payment|
+
+### Calculation results
+
+Paydown.calculate method returns an object with following properties:
+
+Name|Description
+----|-----------
+sum_of_interests|Sum of accrued interests during calculation period
+sum_of_reductions|Total amount of the interest reduction during calculation period
+sum_of_installments|Total sum of interests and reductions during calculation period
+remaining_principal|Remaining principal after calculation end date
+days_calculated|Number of days in the calculation period
+actual_end_date|Actual calculation end date
+
+If Paydown.calculate method is provided with an array as its 3rd argument, the array contents are interpreted as follows:
+
+    [ date, interest rate, installment, principal reduction, interest, remaining principal ]
+    
+## To Do
+- test scripts
+- better input validation
+- better documentation
+- more day count methods
+- length setting of recurring payment period 
+- debug printing / verbose mode
+- loan term features
+- "interests only" payment method
+- etc.
