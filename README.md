@@ -1,13 +1,13 @@
 # Paydown.js
-Yet another loan payment calculation library.
+Loan payment calculation library with advanced features.
 ## Features
 - freely selectable calculation period
 - daily interest calculation
 - recurring payment generation
-- day count methods supported: 
+- day count methods supported:
   - act / 360
-  - act / 365 
-- payment methods supported: 
+  - act / 365
+- payment methods supported:
   - equal installment
   - equal principal reduction
 - freely settable rate changes and extra payments
@@ -42,7 +42,7 @@ catch(err)
   {
   throw(err)
   }
-  
+
 for( var i = 0; i < payments_array.length; i++ )
   {
   console.log( JSON.stringify( payments_array[i] ) )
@@ -73,15 +73,15 @@ var Paydown = require('./paydown.js')
 
 var init_data =
 {
-  "start_date"                 : "1.1.2019",
-  "end_date"                   : "30.6.2019",
-  "principal"                  : 100000,
-  "rate"                       : 3.5,
-  "day_count_method"           : "act/365",
-  "payment_method"             : "equal_installment",
+  "start_date"             : "1.1.2019",
+  "end_date"               : "30.6.2019",
+  "principal"              : 100000,
+  "rate"                   : 3.5,
+  "day_count_method"       : "act/365",
   "recurring":
     {
      "amount"              : 1000,
+     "payment_method"      : "equal_reduction",     
      "first_payment_date"  : "31.1.2019",
      "payment_day"         : 31,
     }
@@ -126,20 +126,20 @@ console.log(JSON.stringify(rval_obj));
 ```
 #### Sample script 2 output:
     ["01.01.2019",3.5,"-","-","-",100000]
-    ["31.01.2019",3.5,1000,702.74,297.26,99297.26]
-    ["28.02.2019",3.5,1000,733.39,266.61,98563.87]
-    ["15.03.2019",5,"-","-","-",98563.87]
-    ["31.03.2019",5,1500,1138.15,361.85,97425.72]
-    ["30.04.2019",5,1500,1099.62,400.38,96326.1]
-    ["15.05.2019",5,4197.93,4000,197.93,92326.1]
-    ["31.05.2019",5,1500,1297.64,202.36,91028.46]
-    ["30.06.2019",5,1500,1125.91,374.09,89902.55]
-    {"sum_of_interests":2100.48,
-    "sum_of_reductions":10097.45,
-    "sum_of_installments":12197.93,
-    "remaining_principal":89902.55,
-    "days_calculated":181,
-    "actual_end_date":"30.6.2019"}
+    ["31.01.2019",3.5,1297.26,1000,297.26,99000]
+    ["28.02.2019",3.5,1265.81,1000,265.81,98000]
+    ["15.03.2019",5,"-","-","-",98000]
+    ["31.03.2019",5,1859.78,1500,359.78,96500]
+    ["30.04.2019",5,1896.58,1500,396.58,95000]
+    ["15.05.2019",5,4195.21,4000,195.21,91000]
+    ["31.05.2019",5,1699.45,1500,199.45,89500]
+    ["30.06.2019",5,1867.81,1500,367.81,88000]
+    {"sum_of_interests":2081.89,
+     "sum_of_reductions":12000,
+     "sum_of_installments":14081.89,
+     "remaining_principal":88000,
+     "days_calculated":181,
+     "actual_end_date":"30.6.2019"}
 
 ## Documentation
 
@@ -203,13 +203,13 @@ actual_end_date|Actual calculation end date
 If Paydown.calculate method is provided with an array as its 3rd argument, the array contents are interpreted as follows:
 
     [ date, interest rate, installment, principal reduction, interest, remaining principal ]
-    
+
 ## To Do
 - test scripts
 - better input validation
 - better documentation
 - more day count methods
-- length setting of recurring payment period 
+- length setting of recurring payment period
 - debug printing / verbose mode
 - loan term features
 - "interests only" payment method

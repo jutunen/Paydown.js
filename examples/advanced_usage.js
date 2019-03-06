@@ -8,10 +8,10 @@ var init_data =
   "principal"                  : 100000,
   "rate"                       : 3.5,
   "day_count_method"           : "act/365",
-  "payment_method"             : "equal_installment",
   "recurring":
     {
      "amount"              : 1000,
+     "payment_method"      : "equal_reduction",
      "first_payment_date"  : "31.1.2019",
      "payment_day"         : 31,
     }

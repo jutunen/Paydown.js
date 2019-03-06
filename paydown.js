@@ -446,16 +446,15 @@ function _Paydown () {
       this.init.day_count_method = 'act/360'
     }
 
-    if (data.hasOwnProperty('payment_method')) {
-      this.init.payment_method = data.payment_method
-    } else {
-      this.init.payment_method = 'equal_installment'
-    }
-
     if (data.hasOwnProperty('recurring')) {
       this.init.amount = data.recurring.amount
       this.init.first_payment_date = data.recurring.first_payment_date
       this.init.payment_day = data.recurring.payment_day
+      if (data.recurring.hasOwnProperty('payment_method')) {
+        this.init.payment_method = data.recurring.payment_method
+      } else {
+        this.init.payment_method = 'equal_installment'
+        }
     } else {
       this.init.amount = ''
     }
