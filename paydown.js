@@ -472,22 +472,22 @@ function _Paydown () {
     }
   }
 
-  this.add_event = function (eventti) {
-    if (!eventti.hasOwnProperty('date')) {
+  this.add_event = function (event) {
+    if (!event.hasOwnProperty('date')) {
       throw 'Error: date property missing from event'
     }
 
-    if (typeof eventti.date !== 'string') {
+    if (typeof event.date !== 'string') {
       throw 'Error: event date must be of type string'
     }
 
-    eventti.date = eventti.date.trim()
+    event.date = event.date.trim()
 
-    if (eventti.date.length > 10 || eventti.date.length < 8) {
-      throw 'Error: invalid event date ' + eventti.date
+    if (event.date.length > 10 || event.date.length < 8) {
+      throw 'Error: invalid event date ' + event.date
     }
 
-    this.event_array.push(Object.assign({}, eventti))
+    this.event_array.push(Object.assign({}, event))
   }
 
   // combine all events with a same date to a single event
@@ -510,15 +510,15 @@ function _Paydown () {
     }
 
     var date_obj = new _Days(this.init.first_payment_date)
-    var eventti
+    var event
 
-    eventti = { date: date_obj.get_current(), pay_recurring: true }
+    event = { date: date_obj.get_current(), pay_recurring: true }
 
-    this.add_event(eventti)
+    this.add_event(event)
 
     while (date_to_integer(date_obj.get_next_month_nth_day(this.init.payment_day)) <= date_to_integer(date)) {
-      eventti = { date: date_obj.get_current(), pay_recurring: true }
-      this.add_event(eventti)
+      event = { date: date_obj.get_current(), pay_recurring: true }
+      this.add_event(event)
     }
 
     this.event_array.sort(event_array_sorter)
