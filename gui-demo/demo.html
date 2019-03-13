@@ -1,0 +1,153 @@
+<!doctype html>
+<!-- saved from url=(0014)about:internet -->
+<HTML>
+
+<HEAD>
+  <link rel="stylesheet" type="text/css" href="demo.css">
+  <script type="text/javascript" src="demo.js"></script>
+  <script type="text/javascript" src="../paydown.js"></script>
+</HEAD>
+
+<BODY onload="func_init()">
+  <div id="error_template" class="error_container">
+    <div id="error_msg_container">
+    </div>
+  </div>
+  <div id="event_template" class="event_container">
+    <div class="event_data">
+      Event Date
+      <INPUT TYPE="text" id="event_date" class="date_input" maxlength="10" placeholder="dd.mm.yyyy">
+    </div>
+    <div class="event_data">
+      New interest rate
+      <INPUT TYPE="text" id="event_rate" class="amount_input_narrow" maxlength="5">
+    </div>
+    <div class="event_data">
+      New recurring amount
+      <INPUT TYPE="text" id="event_recurring_amount" class="amount_input" maxlength="10">
+    </div>
+    <div class="event_data">
+      Single installment
+      <INPUT TYPE="text" id="event_installment" class="amount_input" maxlength="10">
+    </div>
+    <div class="event_data">
+      Single reduction
+      <INPUT TYPE="text" id="event_reduction" class="amount_input" maxlength="10">
+    </div>
+    <div class="event_data">
+      <img src="delete-button.png" alt="Remove" height="25" width="25" onclick="remove_event(this.id)">
+    </div>
+  </div>
+  <div id="output_template" class="output_container">
+    <div id="output_summary_container">
+      <div class="output_value" id="interests">
+      </div>
+      <div class="output_value" id="reductions">
+      </div>
+      <div class="output_value" id="installments">
+      </div>
+      <div class="output_value" id="rem_principal">
+      </div>
+      <div class="output_value" id="days_count">
+      </div>
+      <div class="output_value" id="act_end_date">
+      </div>
+      <div class="output_value" id="latest_payment_date">
+      </div>
+      <div class="output_value" id="unpaid_interest">
+      </div>
+    </div>
+    <div id="output_table_container">
+    </div>
+  </div>
+  <div id="input_container">
+    <div id="init_data_container">
+      <div class="init_data">
+        Start date
+        <INPUT TYPE="text" id="id_start_date" class="date_input" maxlength="10" placeholder="dd.mm.yyyy">
+      </div>
+      <div class="init_data">
+        End date
+        <INPUT TYPE="text" id="id_end_date" class="date_input" maxlength="10" placeholder="dd.mm.yyyy">
+      </div>
+      <div class="init_data">
+        Principal
+        <INPUT TYPE="text" id="id_principal" class="amount_input_wide" maxlength="10">
+      </div>
+      <div class="init_data">
+        Rate
+        <INPUT TYPE="text" id="id_rate" class="amount_input_narrow" maxlength="5"> %
+      </div>
+      <div class="init_data">
+        Day count method
+        <select id="id_day_count_method">
+          <option selected="selected" value="act/360">Act/360</option>
+          <option value="act/365">Act/365</option>
+        </select>
+      </div>
+      <div class="init_data">
+        Recurring payment
+        <INPUT TYPE="text" id="id_payment" class="amount_input" maxlength="10">
+      </div>
+      <div class="init_data">
+        Payment method
+        <select id="id_payment_method">
+          <option selected="selected" value="equal_installment">Equal Installment</option>
+          <option value="equal_reduction">Equal Reduction</option>
+        </select>
+      </div>
+      <div class="init_data">
+        1st recurring payment date
+        <INPUT TYPE="text" id="id_first_payment" class="date_input" maxlength="10" placeholder="dd.mm.yyyy">
+      </div>
+      <div class="init_data">
+        Recurring payment day
+        <select id="id_payment_day">
+          <option selected="selected" value="1">1.</option>
+          <option value="2">2.</option>
+          <option value="3">3.</option>
+          <option value="4">4.</option>
+          <option value="5">5.</option>
+          <option value="6">6.</option>
+          <option value="7">7.</option>
+          <option value="8">8.</option>
+          <option value="9">9.</option>
+          <option value="10">10.</option>
+          <option value="11">11.</option>
+          <option value="12">12.</option>
+          <option value="13">13.</option>
+          <option value="14">14.</option>
+          <option value="15">15.</option>
+          <option value="16">16.</option>
+          <option value="17">17.</option>
+          <option value="18">18.</option>
+          <option value="19">19.</option>
+          <option value="20">20.</option>
+          <option value="21">21.</option>
+          <option value="22">22.</option>
+          <option value="23">23.</option>
+          <option value="24">24.</option>
+          <option value="25">25.</option>
+          <option value="26">26.</option>
+          <option value="27">27.</option>
+          <option value="28">28.</option>
+          <option value="29">29.</option>
+          <option value="30">30.</option>
+          <option value="31">last</option>
+        </select>
+      </div>
+    </div>
+    <div id="buttons_container">
+      <button type="button" onclick="calculate_it()">Calculate</button>
+      <button type="button" onclick="add_event()">Add event</button>
+      <button type="button" onclick="import_basic_values()">Import basic</button>
+      <button type="button" onclick="import_advanced_values()">Import advanced</button>
+      <button type="button" onclick="clear_output()">Clear output</button>
+      <button type="button" onclick="clear_all()">Clear all</button>
+    </div>
+    <div id="events_container">
+    </div>
+  </div>
+</BODY>
+
+</HTML>
