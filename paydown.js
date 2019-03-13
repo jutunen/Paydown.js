@@ -20,10 +20,10 @@ function Paydown () {
 
     var last_date = init_obj.end_date
 
-    var interests, reductions, remaining_principal, actual_end_date
+    var interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest
 
     try {
-      [interests, reductions, remaining_principal, actual_end_date] = paydown.calculate_to_date(last_date, payments_array)
+      [interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest] = paydown.calculate_to_date(last_date, payments_array)
     } catch (err) {
       throw (err)
     }
@@ -31,10 +31,12 @@ function Paydown () {
     return {
       sum_of_interests: interests,
       sum_of_reductions: reductions,
-      sum_of_installments: Number(interests + reductions),
+      sum_of_installments: func_round(Number(interests + reductions - final_interest)),
       remaining_principal: remaining_principal,
       days_calculated: paydown.total_number_of_days,
-      actual_end_date: actual_end_date
+      actual_end_date: actual_end_date,
+      latest_payment_date: latest_payment_date,
+      unpaid_interest: final_interest
     }
   }
 }
@@ -301,6 +303,7 @@ function _Paydown () {
     var index
     var period_interest
     var reduction, installment
+    var final_interest = 0
 
     if (typeof this.init.principal !== 'number') { throw 'Error: this.init.principal illegal parameter type' }
     if (typeof this.init.rate !== 'number') { throw 'Error: this.init.rate illegal parameter type' }
@@ -356,12 +359,12 @@ function _Paydown () {
 
     for (index = 0; index < this.event_array.length; index++) {
       if (this.event_array[index].hasOwnProperty('recurring_amount')) {
-      // recurring payment amount changes
+        // recurring payment amount changes
         this.current_recurring_payment = this.event_array[index].recurring_amount
       }
 
       if (this.event_array[index].hasOwnProperty('pay_recurring')) {
-      // recurring payment transaction occurs
+        // recurring payment transaction occurs
         if (this.init.payment_method === 'equal_installment') {
           if (!this.func_pay_installment(index, date_obj)) {
             break
@@ -395,15 +398,14 @@ function _Paydown () {
 
         if (!this.event_array[index].hasOwnProperty('pay_reduction') &&
             !this.event_array[index].hasOwnProperty('pay_recurring') &&
-            !this.event_array[index].hasOwnProperty('pay_installment') &&
-            this.include_unpaid_interest) {
-              period_interest = this.get_period_interests(this.current_principal, this.current_rate, date_obj.set_current(this.latest_calculated_interest_date).get_next(), this.event_array[index].date)
-              this.sum_of_interests += period_interest
+            !this.event_array[index].hasOwnProperty('pay_installment')) {
+              final_interest = this.get_period_interests(this.current_principal, this.current_rate, date_obj.set_current(this.latest_calculated_interest_date).get_next(), this.event_array[index].date)
+              this.sum_of_interests += final_interest
               this.log_payment([this.event_array[index].date,
                                 this.current_rate,
                                 '-',
                                 '-',
-                                this.func_round(period_interest),
+                                this.func_round(final_interest),
                                 this.func_round(this.current_principal)])
               this.latest_calculated_interest_date = end_date
             } else {
@@ -431,7 +433,9 @@ function _Paydown () {
     return [this.func_round(this.sum_of_interests),
             this.func_round(this.sum_of_reductions),
             this.func_round(this.current_principal),
-            this.latest_calculated_interest_date]
+            this.latest_calculated_interest_date,
+            this.latest_payment_date,
+            this.func_round(final_interest)]
   }
 
   this.set_init = function (data) {
@@ -465,11 +469,6 @@ function _Paydown () {
       this.round_values = true
     }
 
-    if (data.hasOwnProperty('include_unpaid_interest')) {
-      this.include_unpaid_interest = data.include_unpaid_interest
-    } else {
-      this.include_unpaid_interest = true
-    }
   }
 
   this.add_event = function (event) {
@@ -693,6 +692,11 @@ function days_in_month (month, year) {
   } else {
     throw_unexpected_exception('days_in_month')
   }
+}
+
+function func_round(input) {
+  input = Math.round(input * 100) / 100
+  return input
 }
 
 module.exports = Paydown
