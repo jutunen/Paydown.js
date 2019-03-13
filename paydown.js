@@ -191,9 +191,21 @@ function _Paydown () {
     return false
   }
 
-  this.check_date = function (date) {
+  this.check_date = function (date, context) {
+    if(!context) {
+      context = ""
+    }
+
+    if(!date) {
+      throw 'Error: ' + context + ' date is missing'
+    }
+
     if (typeof date !== 'string') {
-      throw 'Error: event date must be of type string ' + date
+      throw 'Error: ' + context + ' date must be of type string: ' + date
+    }
+
+    if(!check_date_validity(date)) {
+      throw 'Error: ' + context + ' date is invalid: ' + date
     }
   }
 
@@ -305,8 +317,9 @@ function _Paydown () {
     var reduction, installment
     var final_interest = 0
 
-    if (typeof this.init.principal !== 'number') { throw 'Error: this.init.principal illegal parameter type' }
-    if (typeof this.init.rate !== 'number') { throw 'Error: this.init.rate illegal parameter type' }
+    if (!this.init.principal) { throw 'Error: principal is missing' }
+    if (typeof this.init.principal !== 'number') { throw 'Error: principal must be number' }
+    if (typeof this.init.rate !== 'number' || isNaN(this.init.rate)) { throw 'Error: rate must be number' }
 
     if (Array.isArray(array_of_events)) {
       this.payment_logging_enabled = true
@@ -320,8 +333,8 @@ function _Paydown () {
 
     var date_obj = new _Days()
 
-    this.check_date(this.init.start_date)
-    this.check_date(this.init.end_date)
+    this.check_date(this.init.start_date, "start")
+    this.check_date(this.init.end_date, "end")
 
     if (is_numeric(this.init.amount) && this.init.amount > 0) {
       this.generate_payment_events_till(end_date)
@@ -476,15 +489,7 @@ function _Paydown () {
       throw 'Error: date property missing from event'
     }
 
-    if (typeof event.date !== 'string') {
-      throw 'Error: event date must be of type string'
-    }
-
-    event.date = event.date.trim()
-
-    if (event.date.length > 10 || event.date.length < 8) {
-      throw 'Error: invalid event date ' + event.date
-    }
+    this.check_date(event.date,"event")
 
     this.event_array.push(Object.assign({}, event))
   }
@@ -504,9 +509,8 @@ function _Paydown () {
   }
 
   this.generate_payment_events_till = function (date) {
-    if (!date || !this.init.first_payment_date) {
-      throw 'Error: this.generate_payment_events_till invalid date'
-    }
+
+    this.check_date(this.init.first_payment_date,"1st recurring payment")
 
     var date_obj = new _Days(this.init.first_payment_date)
     var event
@@ -697,6 +701,29 @@ function days_in_month (month, year) {
 function func_round(input) {
   input = Math.round(input * 100) / 100
   return input
+}
+
+function check_date_validity(date) {
+  var result = date.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/)
+
+  if(!result) {
+    return false
+  }
+
+  var day = Number(result[1])
+  var month = Number(result[2])
+  var year = Number(result[3])
+  var last_day_of_month = days_in_month(month,year)
+
+  if(day < 1 || day > last_day_of_month) {
+    return false
+  }
+
+  if(month < 1 || month > 12 ) {
+    return false
+  }
+
+  return true
 }
 
 module.exports = Paydown
