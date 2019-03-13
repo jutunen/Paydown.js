@@ -17,18 +17,18 @@ Loan payment calculation library with advanced features.
 var Paydown = require('./paydown.js')
 
 var init_data =
-{
+  {
   "start_date"             : "1.1.2019",
-  "end_date"               : "31.12.2019",
+  "end_date"               : "30.6.2019",
   "principal"              : 100000,
   "rate"                   : 3.5,
   "recurring":
     {
      "amount"              : 1000,
-     "first_payment_date"  : "1.1.2019",
+     "first_payment_date"  : "31.1.2019",
      "payment_day"         : 31,
     }
-}
+  }
 
 var payments_array = []
 var rval_obj
@@ -60,11 +60,13 @@ console.log( JSON.stringify( rval_obj ) );
     ["31.05.2019",3.5,1000,707.19,292.81,96447.06]
     ["30.06.2019",3.5,1000,718.7,281.3,95728.36]
     {"sum_of_interests":1728.36,
-    "sum_of_reductions":4271.64,
-    "sum_of_installments":6000,
-    "remaining_principal":95728.36,
-    "days_calculated":181,
-    "actual_end_date":"30.6.2019"}
+     "sum_of_reductions":4271.64,
+     "sum_of_installments":6000,
+     "remaining_principal":95728.36,
+     "days_calculated":181,
+     "actual_end_date":"30.6.2019",
+     "latest_payment_date":"30.6.2019",
+     "unpaid_interest":0}
 
 ## Advanced usage example
 #### Sample script 2:
@@ -72,7 +74,7 @@ console.log( JSON.stringify( rval_obj ) );
 var Paydown = require('./paydown.js')
 
 var init_data =
-{
+  {
   "start_date"             : "1.1.2019",
   "end_date"               : "30.6.2019",
   "principal"              : 100000,
@@ -85,7 +87,7 @@ var init_data =
      "first_payment_date"  : "31.1.2019",
      "payment_day"         : 31,
     }
-}
+  }
 
 var event_obj =
   {
@@ -139,7 +141,9 @@ console.log(JSON.stringify(rval_obj));
      "sum_of_installments":14081.89,
      "remaining_principal":88000,
      "days_calculated":181,
-     "actual_end_date":"30.6.2019"}
+     "actual_end_date":"30.6.2019",
+     "latest_payment_date":"30.6.2019",
+     "unpaid_interest":0}
 
 ## Documentation
 
@@ -155,7 +159,7 @@ init_data|input|object|no|Initial calculation values
 events|input|array of objects|yes|List of changes during calculation period
 payments|output|array|yes|List of individual payments
 
-#### Init_data properties
+#### Init_data object properties
 
 Name|Type|Optional|Description|Format / Values|Default value
 ----|----|--------|-----------|---------------|-------------
@@ -165,10 +169,9 @@ principal|number|no|Principal amount at the start date|
 rate|number|no|Interest rate at the start date|
 day_count_method|string|yes|Determines how interest accrues over time|"act/360"<br>"act/365"|"act/360"
 round_values|boolean|yes|Sets output value rounding to 2 decimals|true<br>false|true
-include_unpaid_interest|boolean|yes|Determines whether final "loose" interests shall be added to the total sum of interests|true<br>false|true
 recurring|object|yes|Defines recurring payments|See below|
 
-#### Recurring properties
+#### Recurring object properties
 
 Name|Type|Optional|Description|Format / Values|Default value
 ----|----|--------|-----------|---------------|-------------
@@ -193,12 +196,14 @@ Paydown.calculate method returns an object with following properties:
 
 Name|Description
 ----|-----------
-sum_of_interests|Sum of accrued interests during calculation period
-sum_of_reductions|Total amount of the principal reduction during calculation period
-sum_of_installments|Total sum of interests and reductions during calculation period
+sum_of_interests|Total sum of accrued interests during calculation period
+sum_of_reductions|Total amount of the principal reductions during calculation period
+sum_of_installments|Total sum of installments during calculation period
 remaining_principal|Remaining principal after calculation end date
 days_calculated|Number of days in the calculation period
 actual_end_date|Actual calculation end date
+latest_payment_date|Latest payment date
+unpaid_interest|Interests accrued after latest payment date
 
 If Paydown.calculate method is provided with an array as its 3rd argument, the array contents are interpreted as follows:
 
