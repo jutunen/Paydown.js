@@ -145,6 +145,10 @@ console.log(JSON.stringify(rval_obj));
      "latest_payment_date":"30.6.2019",
      "unpaid_interest":0}
 
+## GUI demo
+
+Both examples above are available in the GUI demo, see http://51.255.43.70/paydown-demo/
+
 ## Documentation
 
 ### Invoking the calculation
