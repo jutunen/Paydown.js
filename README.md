@@ -148,6 +148,7 @@ console.log(JSON.stringify(rval_obj));
 ## GUI demo
 
 Both examples above are available in the GUI demo, see http://51.255.43.70/paydown-demo/
+
 Use import buttons to get the input values and then click Calculate.
 
 ## Documentation
