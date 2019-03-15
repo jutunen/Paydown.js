@@ -317,8 +317,8 @@ function _Paydown () {
     var reduction, installment
     var final_interest = 0
 
-    if (!this.init.principal) { throw 'Error: principal is missing' }
-    if (typeof this.init.principal !== 'number') { throw 'Error: principal must be number' }
+    if (typeof this.init.principal !== 'number' || isNaN(this.init.principal)) { throw 'Error: principal must be number' }
+    if (this.init.principal === 0) { throw 'Error: principal is missing' }
     if (typeof this.init.rate !== 'number' || isNaN(this.init.rate)) { throw 'Error: rate must be number' }
 
     if (Array.isArray(array_of_events)) {
