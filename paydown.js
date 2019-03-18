@@ -713,13 +713,14 @@ function check_date_validity(date) {
   var day = Number(result[1])
   var month = Number(result[2])
   var year = Number(result[3])
+
+  if(month < 1 || month > 12 ) {
+    return false
+  }
+  
   var last_day_of_month = days_in_month(month,year)
 
   if(day < 1 || day > last_day_of_month) {
-    return false
-  }
-
-  if(month < 1 || month > 12 ) {
     return false
   }
 
