@@ -1,0 +1,157 @@
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+td {
+  padding: 1px 15px;
+  border: 1px solid black;
+  min-width: 100px;
+}
+
+table {
+  border: 1px solid black;
+  margin: auto;
+  background-color: white;
+  border-spacing: 0;
+  text-align: center;
+}
+
+div.event_container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 920px;
+  background-color: #f2f2f2;
+  padding: 3px 0px;
+  margin: auto;
+  margin-top: 2px;
+}
+
+div.event_container:last-child{
+  margin-bottom: 20px;
+}
+
+div.event_data{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+div#heading_container{
+  display: flex;
+  flex-direction: column;
+  width: 960px;
+  background-color: lightgrey;
+  margin: auto;
+}
+
+div#heading_content{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  width: 920px;
+  background-color: #f2f2f2;
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 5px 0px;
+  font-size: 18px;
+  font-style: italic;
+}
+
+.bold_class{
+  font-weight: bold;
+}
+
+div#react_container {
+  display: flex;
+  flex-direction: column;
+  width: 960px;
+  background-color: lightgrey;
+  margin: auto;
+  padding-bottom: 20px;
+}
+
+div#error_container{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 5px;
+  color: red;
+  font-size: 18px;
+}
+
+div#output_summary_container{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  width: 920px;
+  background-color: #f2f2f2;
+  margin: 20px;
+  padding-bottom: 10px;
+}
+
+div#output_summary_container.summary_shade, .table_shade{
+  opacity: 0.2;
+}
+
+div.init_data{
+  display: flex;
+  align-items: center;
+  padding: 2px 10px;
+  background-color: white;
+  margin:5px;
+}
+
+div.output_value{
+  padding: 5px 20px;
+  background-color: white;
+  border-width: 2px;
+  border-color: #f2f2f2;
+  margin-top: 10px;
+  margin-right: 10px;
+  flex-basis: 240px;
+}
+
+div.init_data_container{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  width: 920px;
+  background-color: #f2f2f2;
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+div#buttons_container{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  position: relative;
+  width: 920px;
+  background-color: #f2f2f2;
+  margin: 20px;
+  padding: 3px 0px;
+}
+
+input.date_input{
+  width: 80px;
+}
+
+input.amount_input_wide{
+  width: 70px;
+}
+
+input.amount_input{
+  width: 50px;
+}
+
+input.amount_input_narrow{
+  width: 35px;
+}
