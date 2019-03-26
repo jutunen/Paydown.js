@@ -9,48 +9,72 @@ function get_new_id () {
 function Form (props) {
   return (
     <div className='init_data_container'>
-      <div className='init_data'>
+      <div data-tip data-for='startDate' className='init_data'>
         Start date
         <input value={props.values.startDate} onChange={x => props.callback(x, 0)} type='text' className='date_input' maxLength='10' placeholder='dd.mm.yyyy' />
       </div>
-      <div className='init_data'>
+      <ReactTooltip id='startDate' effect='solid'>
+        <span>Calculation start date</span>
+      </ReactTooltip>
+      <div data-tip data-for='endDate' className='init_data'>
         End date
         <input value={props.values.endDate} onChange={x => props.callback(x, 1)} type='text' className='date_input' maxLength='10' placeholder='dd.mm.yyyy' />
       </div>
-      <div className='init_data'>
+      <ReactTooltip id='endDate' effect='solid'>
+        <span>Calculation end date</span>
+      </ReactTooltip>
+      <div data-tip data-for='principal' className='init_data'>
         Principal
         <input value={props.values.principal} onChange={x => props.callback(x, 2)} type='text' className='amount_input_wide' maxLength='10' />
       </div>
-      <div className='init_data'>
+      <ReactTooltip id='principal' effect='solid'>
+        <span>Principal amount at the start date</span>
+      </ReactTooltip>
+      <div data-tip data-for='rate' className='init_data'>
         Rate
         <input value={props.values.rate} onChange={x => props.callback(x, 3)} type='text' className='amount_input_narrow' maxLength='5' /> %
       </div>
-      <div className='init_data'>
+      <ReactTooltip id='rate' effect='solid'>
+        <span>Interest rate at the start date</span>
+      </ReactTooltip>
+      <div data-tip data-for='dayCountMethod' className='init_data'>
         Day count method
         <select value={props.values.dayCountMethod} onChange={x => props.callback(x, 4)}>
-          <option selected='selected' value='act/360'>Act/360</option>
+          <option value='act/360'>Act/360</option>
           <option value='act/365'>Act/365</option>
         </select>
       </div>
-      <div className='init_data'>
+      <ReactTooltip id='dayCountMethod' effect='solid'>
+        <span>Determines how interest accrues over time</span>
+      </ReactTooltip>
+      <div data-tip data-for='recurringPayment' className='init_data'>
         Recurring payment
         <input value={props.values.recurringPayment} onChange={x => props.callback(x, 5)} type='text' className='amount_input' maxLength='10' />
       </div>
-      <div className='init_data'>
+      <ReactTooltip id='recurringPayment' effect='solid'>
+        <span>The amount of recurring payment</span>
+      </ReactTooltip>
+      <div data-tip data-for='paymentMethod' className='init_data'>
         Payment method
         <select value={props.values.paymentMethod} onChange={x => props.callback(x, 6)}>
-          <option selected='selected' value='equal_installment'>Equal Installment</option>
+          <option value='equal_installment'>Equal Installment</option>
           <option value='equal_reduction'>Equal Reduction</option>
         </select>
       </div>
-      <div className='init_data'>
+      <ReactTooltip id='paymentMethod' effect='solid'>
+        <span>Payment method for recurring payments</span>
+      </ReactTooltip>
+      <div data-tip data-for='firstPaymentDate' className='init_data'>
         1st recurring payment date
         <input value={props.values.firstPaymentDate} onChange={x => props.callback(x, 7)} type='text' className='date_input' maxLength='10' placeholder='dd.mm.yyyy' />
       </div>
-      <div className='init_data'>
+      <ReactTooltip id='firstPaymentDate' effect='solid'>
+        <span>First recurring payment date</span>
+      </ReactTooltip>
+      <div data-tip data-for='recurringPaymentDay' className='init_data'>
         Recurring payment day
         <select value={props.values.recurringPaymentDay} onChange={x => props.callback(x, 8)}>
-          <option selected='selected' value='1'>1.</option>
+          <option value='1'>1.</option>
           <option value='2'>2.</option>
           <option value='3'>3.</option>
           <option value='4'>4.</option>
@@ -83,12 +107,19 @@ function Form (props) {
           <option value='31'>last</option>
         </select>
       </div>
+      <ReactTooltip id='recurringPaymentDay' effect='solid'>
+        <span>Monthly payment day of the recurring payment</span>
+      </ReactTooltip>
     </div>
   )
 }
 
 function Summary (props) {
   var klass = ''
+
+  if (!props.values.hasOwnProperty('sum_of_interests')) {
+    return null
+  }
 
   if (props.error) {
     klass = 'summary_shade'
@@ -247,11 +278,11 @@ class Container extends React.Component {
       endDate: '',
       principal: '',
       rate: '',
-      dayCountMethod: '',
+      dayCountMethod: 'act/360',
       recurringPayment: '',
-      paymentMethod: '',
+      paymentMethod: 'equal_installment',
       firstPaymentDate: '',
-      recurringPaymentDay: '',
+      recurringPaymentDay: '1',
       events: []
     }
 

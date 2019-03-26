@@ -22,31 +22,58 @@ function Form(props) {
     { className: 'init_data_container' },
     React.createElement(
       'div',
-      { className: 'init_data' },
+      { 'data-tip': true, 'data-for': 'startDate', className: 'init_data' },
       'Start date',
       React.createElement('input', { value: props.values.startDate, onChange: function onChange(x) {
           return props.callback(x, 0);
         }, type: 'text', className: 'date_input', maxLength: '10', placeholder: 'dd.mm.yyyy' })
     ),
     React.createElement(
+      ReactTooltip,
+      { id: 'startDate', effect: 'solid' },
+      React.createElement(
+        'span',
+        null,
+        'Calculation start date'
+      )
+    ),
+    React.createElement(
       'div',
-      { className: 'init_data' },
+      { 'data-tip': true, 'data-for': 'endDate', className: 'init_data' },
       'End date',
       React.createElement('input', { value: props.values.endDate, onChange: function onChange(x) {
           return props.callback(x, 1);
         }, type: 'text', className: 'date_input', maxLength: '10', placeholder: 'dd.mm.yyyy' })
     ),
     React.createElement(
+      ReactTooltip,
+      { id: 'endDate', effect: 'solid' },
+      React.createElement(
+        'span',
+        null,
+        'Calculation end date'
+      )
+    ),
+    React.createElement(
       'div',
-      { className: 'init_data' },
+      { 'data-tip': true, 'data-for': 'principal', className: 'init_data' },
       'Principal',
       React.createElement('input', { value: props.values.principal, onChange: function onChange(x) {
           return props.callback(x, 2);
         }, type: 'text', className: 'amount_input_wide', maxLength: '10' })
     ),
     React.createElement(
+      ReactTooltip,
+      { id: 'principal', effect: 'solid' },
+      React.createElement(
+        'span',
+        null,
+        'Principal amount at the start date'
+      )
+    ),
+    React.createElement(
       'div',
-      { className: 'init_data' },
+      { 'data-tip': true, 'data-for': 'rate', className: 'init_data' },
       'Rate',
       React.createElement('input', { value: props.values.rate, onChange: function onChange(x) {
           return props.callback(x, 3);
@@ -54,8 +81,17 @@ function Form(props) {
       ' %'
     ),
     React.createElement(
+      ReactTooltip,
+      { id: 'rate', effect: 'solid' },
+      React.createElement(
+        'span',
+        null,
+        'Interest rate at the start date'
+      )
+    ),
+    React.createElement(
       'div',
-      { className: 'init_data' },
+      { 'data-tip': true, 'data-for': 'dayCountMethod', className: 'init_data' },
       'Day count method',
       React.createElement(
         'select',
@@ -64,7 +100,7 @@ function Form(props) {
           } },
         React.createElement(
           'option',
-          { selected: 'selected', value: 'act/360' },
+          { value: 'act/360' },
           'Act/360'
         ),
         React.createElement(
@@ -75,16 +111,34 @@ function Form(props) {
       )
     ),
     React.createElement(
+      ReactTooltip,
+      { id: 'dayCountMethod', effect: 'solid' },
+      React.createElement(
+        'span',
+        null,
+        'Determines how interest accrues over time'
+      )
+    ),
+    React.createElement(
       'div',
-      { className: 'init_data' },
+      { 'data-tip': true, 'data-for': 'recurringPayment', className: 'init_data' },
       'Recurring payment',
       React.createElement('input', { value: props.values.recurringPayment, onChange: function onChange(x) {
           return props.callback(x, 5);
         }, type: 'text', className: 'amount_input', maxLength: '10' })
     ),
     React.createElement(
+      ReactTooltip,
+      { id: 'recurringPayment', effect: 'solid' },
+      React.createElement(
+        'span',
+        null,
+        'The amount of recurring payment'
+      )
+    ),
+    React.createElement(
       'div',
-      { className: 'init_data' },
+      { 'data-tip': true, 'data-for': 'paymentMethod', className: 'init_data' },
       'Payment method',
       React.createElement(
         'select',
@@ -93,7 +147,7 @@ function Form(props) {
           } },
         React.createElement(
           'option',
-          { selected: 'selected', value: 'equal_installment' },
+          { value: 'equal_installment' },
           'Equal Installment'
         ),
         React.createElement(
@@ -104,16 +158,34 @@ function Form(props) {
       )
     ),
     React.createElement(
+      ReactTooltip,
+      { id: 'paymentMethod', effect: 'solid' },
+      React.createElement(
+        'span',
+        null,
+        'Payment method for recurring payments'
+      )
+    ),
+    React.createElement(
       'div',
-      { className: 'init_data' },
+      { 'data-tip': true, 'data-for': 'firstPaymentDate', className: 'init_data' },
       '1st recurring payment date',
       React.createElement('input', { value: props.values.firstPaymentDate, onChange: function onChange(x) {
           return props.callback(x, 7);
         }, type: 'text', className: 'date_input', maxLength: '10', placeholder: 'dd.mm.yyyy' })
     ),
     React.createElement(
+      ReactTooltip,
+      { id: 'firstPaymentDate', effect: 'solid' },
+      React.createElement(
+        'span',
+        null,
+        'First recurring payment date'
+      )
+    ),
+    React.createElement(
       'div',
-      { className: 'init_data' },
+      { 'data-tip': true, 'data-for': 'recurringPaymentDay', className: 'init_data' },
       'Recurring payment day',
       React.createElement(
         'select',
@@ -122,7 +194,7 @@ function Form(props) {
           } },
         React.createElement(
           'option',
-          { selected: 'selected', value: '1' },
+          { value: '1' },
           '1.'
         ),
         React.createElement(
@@ -276,12 +348,25 @@ function Form(props) {
           'last'
         )
       )
+    ),
+    React.createElement(
+      ReactTooltip,
+      { id: 'recurringPaymentDay', effect: 'solid' },
+      React.createElement(
+        'span',
+        null,
+        'Monthly payment day of the recurring payment'
+      )
     )
   );
 }
 
 function Summary(props) {
   var klass = '';
+
+  if (!props.values.hasOwnProperty('sum_of_interests')) {
+    return null;
+  }
 
   if (props.error) {
     klass = 'summary_shade';
@@ -595,11 +680,11 @@ var Container = function (_React$Component) {
       endDate: '',
       principal: '',
       rate: '',
-      dayCountMethod: '',
+      dayCountMethod: 'act/360',
       recurringPayment: '',
-      paymentMethod: '',
+      paymentMethod: 'equal_installment',
       firstPaymentDate: '',
-      recurringPaymentDay: '',
+      recurringPaymentDay: '1',
       events: []
     };
 
