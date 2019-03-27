@@ -222,8 +222,14 @@ function Buttons (props) {
   return (
     <div id='buttons_container'>
       <button onClick={() => props.callback(1)} type='button'>Add event</button>
-      <button onClick={() => props.callback(2)} type='button'>Import basic</button>
-      <button onClick={() => props.callback(3)} type='button'>Import advanced</button>
+      <button data-tip data-for='importBasic' onClick={() => props.callback(2)} type='button'>Import basic</button>
+      <ReactTooltip id='importBasic' effect='solid'>
+        <span>Import basic example</span>
+      </ReactTooltip>
+      <button data-tip data-for='importAdvanced' onClick={() => props.callback(3)} type='button'>Import advanced</button>
+      <ReactTooltip id='importAdvanced' effect='solid'>
+        <span>Import advanced example</span>
+      </ReactTooltip>
       <button onClick={() => props.callback(4)} type='button'>Clear all</button>
     </div>
   )
