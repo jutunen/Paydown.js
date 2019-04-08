@@ -1,24 +1,44 @@
-'use strict'
+import React, { Component } from 'react';
+import ReactTooltip from 'react-tooltip';
+import DatePicker from 'react-datepicker';
+import './react-datepicker.css';
+import './App.css';
+import delButton from './delete-button.png';
+import Paydown from './paydown.js'
 
 var g_event_id_counter
-
-function get_new_id () {
-  return String(g_event_id_counter++)
-}
 
 function Form (props) {
   return (
     <div className='init_data_container'>
       <div data-tip data-for='startDate' className='init_data'>
         Start date
-        <input value={props.values.startDate} onChange={x => props.callback(x, 0)} type='text' className='date_input' maxLength='10' placeholder='dd.mm.yyyy' />
+        <DatePicker
+          selected={props.values.startDate}
+          onChange={x => props.callback(x, 0)}
+          placeholderText="dd.mm.yyyy"
+          dateFormat="dd.MM.yyyy"
+          disabledKeyboardNavigation={true}
+          showMonthDropdown
+          showYearDropdown
+          dropdownMode="select"
+        />
       </div>
       <ReactTooltip id='startDate' effect='solid'>
         <span>Calculation start date</span>
       </ReactTooltip>
       <div data-tip data-for='endDate' className='init_data'>
         End date
-        <input value={props.values.endDate} onChange={x => props.callback(x, 1)} type='text' className='date_input' maxLength='10' placeholder='dd.mm.yyyy' />
+        <DatePicker
+          selected={props.values.endDate}
+          onChange={x => props.callback(x, 1)}
+          placeholderText="dd.mm.yyyy"
+          dateFormat="dd.MM.yyyy"
+          disabledKeyboardNavigation={true}
+          showMonthDropdown
+          showYearDropdown
+          dropdownMode="select"
+        />
       </div>
       <ReactTooltip id='endDate' effect='solid'>
         <span>Calculation end date</span>
@@ -66,7 +86,16 @@ function Form (props) {
       </ReactTooltip>
       <div data-tip data-for='firstPaymentDate' className='init_data'>
         1st recurring payment date
-        <input value={props.values.firstPaymentDate} onChange={x => props.callback(x, 7)} type='text' className='date_input' maxLength='10' placeholder='dd.mm.yyyy' />
+        <DatePicker
+          selected={props.values.firstPaymentDate}
+          onChange={x => props.callback(x, 7)}
+          placeholderText="dd.mm.yyyy"
+          dateFormat="dd.MM.yyyy"
+          disabledKeyboardNavigation={true}
+          showMonthDropdown
+          showYearDropdown
+          dropdownMode="select"
+        />
       </div>
       <ReactTooltip id='firstPaymentDate' effect='solid'>
         <span>First recurring payment date</span>
@@ -240,7 +269,16 @@ function Event (props, callback) {
     <div className='event_container' key={props.id}>
       <div className='event_data'>
         Event Date
-        <input type='text' value={props.date} onChange={x => callback(x, props.id, 0)} className='date_input' maxLength='10' placeholder='dd.mm.yyyy' />
+        <DatePicker
+          selected={props.date}
+          onChange={x => callback(x, props.id, 0)}
+          placeholderText="dd.mm.yyyy"
+          dateFormat="dd.MM.yyyy"
+          disabledKeyboardNavigation={true}
+          showMonthDropdown
+          showYearDropdown
+          dropdownMode="select"
+        />
       </div>
       <div className='event_data'>
         New interest rate
@@ -259,7 +297,7 @@ function Event (props, callback) {
         <input type='text' value={props.pay_reduction} onChange={x => callback(x, props.id, 4)} className='amount_input' maxLength='10' />
       </div>
       <div className='event_data'>
-        <img src='delete-button.png' alt='Remove' height='25' width='25' onClick={x => callback(x, props.id, 5)} />
+        <img src={delButton} alt='Remove' height='25' width='25' onClick={x => callback(x, props.id, 5)} />
       </div>
     </div>
   )
@@ -273,21 +311,21 @@ function Events (props) {
   )
 }
 
-class Container extends React.Component {
+class App extends Component {
   constructor (props) {
     super(props)
     this.state = {
       values: [],
       summary: {},
       error: '',
-      startDate: '',
-      endDate: '',
+      startDate: null,
+      endDate: null,
       principal: '',
       rate: '',
       dayCountMethod: 'act/360',
       recurringPayment: '',
       paymentMethod: 'equal_installment',
-      firstPaymentDate: '',
+      firstPaymentDate: null,
       recurringPaymentDay: '1',
       events: []
     }
@@ -295,6 +333,8 @@ class Container extends React.Component {
     this.handleInput = this.handleInput.bind(this)
     this.handleEvents = this.handleEvents.bind(this)
     this.handleButtons = this.handleButtons.bind(this)
+
+    g_event_id_counter = 0
   }
 
   addEvent (obj_ref) {
@@ -335,6 +375,7 @@ class Container extends React.Component {
       event.pay_installment = array_ref[i].pay_installment
       event.pay_reduction = array_ref[i].pay_reduction
       event.id = get_new_id()
+      console.log("event.id: " + event.id)
       events.push(event)
     }
     this.setState({events: events})
@@ -345,7 +386,7 @@ class Container extends React.Component {
     var index = events_clone.findIndex(x => findEventById(x, event_id))
 
     if (field_id === 0) { // date
-      events_clone[index].date = synthEvent.target.value
+      events_clone[index].date = synthEvent
     } else if (field_id === 1) { // rate
       events_clone[index].rate = synthEvent.target.value
     } else if (field_id === 2) { // amount
@@ -385,37 +426,37 @@ class Container extends React.Component {
   }
 
   importBasic () {
-    this.setState({startDate: '1.1.2019'})
-    this.setState({endDate: '30.6.2019'})
+    this.setState({startDate: new Date(2019,0,1)})
+    this.setState({endDate: new Date(2019,5,30)})
     this.setState({principal: '100000'})
     this.setState({rate: '3.5'})
     this.setState({dayCountMethod: 'act/360'})
     this.setState({recurringPayment: '1000'})
     this.setState({paymentMethod: 'equal_installment'})
-    this.setState({firstPaymentDate: '31.1.2019'})
+    this.setState({firstPaymentDate: new Date(2019,0,31)})
     this.setState({recurringPaymentDay: '31'}, this.calculateInput)
   }
 
   importAdvanced () {
-    this.setState({startDate: '1.1.2019'})
-    this.setState({endDate: '30.6.2019'})
+    this.setState({startDate: new Date(2019,0,1)})
+    this.setState({endDate: new Date(2019,5,30)})
     this.setState({principal: '100000'})
     this.setState({rate: '3.5'})
     this.setState({dayCountMethod: 'act/365'})
     this.setState({recurringPayment: '1000'})
     this.setState({paymentMethod: 'equal_reduction'})
-    this.setState({firstPaymentDate: '31.1.2019'})
+    this.setState({firstPaymentDate: new Date(2019,0,31)})
     this.setState({recurringPaymentDay: '31'}, this.calculateInput)
 
     var obj = {}
-    obj.date = '15.3.2019'
+    obj.date = new Date(2019,2,15)
     obj.rate = 5
     obj.recurring_amount = 1500
     obj.pay_installment = ''
     obj.pay_reduction = ''
 
     var obj_2 = {}
-    obj_2.date = '15.5.2019'
+    obj_2.date = new Date(2019,4,15)
     obj_2.rate = ''
     obj_2.recurring_amount = ''
     obj_2.pay_installment = ''
@@ -429,9 +470,9 @@ class Container extends React.Component {
 
   handleInput (event, id) {
     if (id === 0) {
-      this.setState({startDate: event.target.value}, this.calculateInput)
+      this.setState({startDate: event}, this.calculateInput)
     } else if (id === 1) {
-      this.setState({endDate: event.target.value}, this.calculateInput)
+      this.setState({endDate: event}, this.calculateInput)
     } else if (id === 2) {
       this.setState({principal: event.target.value}, this.calculateInput)
     } else if (id === 3) {
@@ -443,10 +484,11 @@ class Container extends React.Component {
     } else if (id === 6) {
       this.setState({paymentMethod: event.target.value}, this.calculateInput)
     } else if (id === 7) {
-      this.setState({firstPaymentDate: event.target.value}, this.calculateInput)
+      this.setState({firstPaymentDate: event}, this.calculateInput)
     } else if (id === 8) {
       this.setState({recurringPaymentDay: event.target.value}, this.calculateInput)
     }
+    ReactTooltip.hide()
   }
 
   copyEvents (array_ref) {
@@ -454,7 +496,7 @@ class Container extends React.Component {
     var obj = {}
     for (i = 0; i < this.state.events.length; i++) {
       if (this.state.events[i].date) {
-        obj.date = this.state.events[i].date
+        obj.date = String(this.state.events[i].date.getDate()) + '.' + String(this.state.events[i].date.getMonth() + 1) + '.' + String(this.state.events[i].date.getFullYear())
       }
       if (is_numeric(this.state.events[i].rate)) {
         obj.rate = Number(this.state.events[i].rate)
@@ -476,14 +518,28 @@ class Container extends React.Component {
   calculateInput () {
     var input_data = {}
     input_data.recurring = {}
-    input_data.start_date = this.state.startDate
-    input_data.end_date = this.state.endDate
+    if(this.state.startDate instanceof Date) {
+      input_data.start_date = String(this.state.startDate.getDate()) + '.' + String(this.state.startDate.getMonth() + 1) + '.' + String(this.state.startDate.getFullYear())
+    } else {
+      this.setError(":Invalid start date!")
+      return
+    }
+    if(this.state.endDate instanceof Date) {
+      input_data.end_date =  String(this.state.endDate.getDate()) + '.' + String(this.state.endDate.getMonth() + 1) + '.' + String(this.state.endDate.getFullYear())
+    } else {
+      this.setError(":Invalid end date!")
+      return
+    }
     input_data.principal = Number(this.state.principal)
     input_data.rate = Number(this.state.rate)
     input_data.day_count_method = this.state.dayCountMethod
     input_data.recurring.amount = Number(this.state.recurringPayment)
     input_data.recurring.payment_method = this.state.paymentMethod
-    input_data.recurring.first_payment_date = this.state.firstPaymentDate
+    if(this.state.firstPaymentDate instanceof Date) {
+      input_data.recurring.first_payment_date = String(this.state.firstPaymentDate.getDate()) + '.' + String(this.state.firstPaymentDate.getMonth() + 1) + '.' + String(this.state.firstPaymentDate.getFullYear())
+    } else {
+      input_data.recurring.first_payment_date = '';
+    }
     input_data.recurring.payment_day = this.state.recurringPaymentDay
 
     var paydown = new Paydown()
@@ -544,9 +600,8 @@ class Container extends React.Component {
   }
 }
 
-function func_init () {
-  g_event_id_counter = 0
-  ReactDOM.render(<Container />, document.getElementById('react_container'))
+function get_new_id () {
+  return String(g_event_id_counter++)
 }
 
 function is_numeric (n) {
@@ -559,3 +614,5 @@ function findEventById (x, event_id) {
   }
   return false
 }
+
+export default App;
