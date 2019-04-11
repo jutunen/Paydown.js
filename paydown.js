@@ -242,7 +242,7 @@ function _Paydown () {
       period_interest = this.get_period_interests(this.current_principal, this.current_rate, start_date, end_date)
     }
 
-    if (!installment) {
+    if (!installment) { // FIX THIS!!!
       installment = this.current_recurring_payment
     }
 
@@ -335,6 +335,7 @@ function _Paydown () {
 
     this.check_date(this.init.start_date, "start")
     this.check_date(this.init.end_date, "end")
+    this.check_first_payment_date();
 
     if (is_numeric(this.init.amount) && this.init.amount > 0) {
       this.generate_payment_events_till(end_date)
@@ -508,9 +509,16 @@ function _Paydown () {
     }
   }
 
-  this.generate_payment_events_till = function (date) {
+  this.check_first_payment_date = function () {
 
     this.check_date(this.init.first_payment_date,"1st recurring payment")
+    if( date_to_integer(this.init.first_payment_date) <= date_to_integer(this.init.start_date) ) {
+      throw 'Error: first payment date must be after start date'
+    }
+
+  }
+
+  this.generate_payment_events_till = function (date) {
 
     var date_obj = new _Days(this.init.first_payment_date)
     var event
@@ -717,7 +725,7 @@ function check_date_validity(date) {
   if(month < 1 || month > 12 ) {
     return false
   }
-  
+
   var last_day_of_month = days_in_month(month,year)
 
   if(day < 1 || day > last_day_of_month) {
