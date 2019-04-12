@@ -9,3 +9,4 @@ When the script paydown-browser-iife.js is loaded, it defines a global object ca
 ```javascript
  Paydown.calculate(paydown_init_data, events_array, payments_array)
 ```
+The calculate method can be considered as pure, the global object doesn't preserve any state after it has been called.
