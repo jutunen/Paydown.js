@@ -1,5 +1,5 @@
 
-var Paydown = require('../paydown.js')
+var Paydown = require('../dist/paydown-node.js')
 
 var init_data =
 {
