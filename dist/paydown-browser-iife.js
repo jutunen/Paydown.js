@@ -1,6 +1,6 @@
 
 
-var Paydown = (function () {
+const Paydown = (function () {
 
 function Paydown () {
   this.calculate = function (init_obj, events_array, payments_array) {
