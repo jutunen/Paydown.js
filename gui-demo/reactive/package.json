@@ -7,7 +7,8 @@
     "react-datepicker": "^2.3.0",
     "react-dom": "^16.8.6",
     "react-scripts": "2.1.8",
-    "react-tooltip": "^3.10.0"
+    "react-tooltip": "^3.10.0",
+    "paydown": "0.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -24,5 +25,5 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "homepage":"."
+  "homepage": "."
 }

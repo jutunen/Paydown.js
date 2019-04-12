@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
 import DatePicker from 'react-datepicker';
+import Paydown from 'paydown';
 import './react-datepicker.css';
 import './App.css';
 import delButton from './delete-button.png';
-import Paydown from './paydown.js'
 
 var g_event_id_counter
 
