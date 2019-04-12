@@ -734,5 +734,3 @@ function check_date_validity(date) {
 
   return true
 }
-
-module.exports = Paydown
