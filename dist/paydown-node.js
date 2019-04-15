@@ -332,7 +332,9 @@ function _Paydown () {
 
     this.check_date(this.init.start_date, "start")
     this.check_date(this.init.end_date, "end")
-    this.check_first_payment_date();
+    if(this.init.amount) {
+      this.check_first_payment_date();
+    }
 
     if (is_numeric(this.init.amount) && this.init.amount > 0) {
       this.generate_payment_events_till(end_date)
