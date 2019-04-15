@@ -1,0 +1,36 @@
+{
+  "name": "paydown",
+  "version": "0.0.2",
+  "description": "Loan payment calculation library with advanced features",
+  "main": "dist/paydown-node.js",
+  "directories": {
+    "example": "examples"
+  },
+  "files": [
+    "dist/paydown-node.js"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jutunen/Paydown.js.git"
+  },
+  "keywords": [
+    "loan",
+    "payment",
+    "calculation",
+    "amortization",
+    "calculator"
+  ],
+  "author": "Jussi Utunen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jutunen/Paydown.js/issues"
+  },
+  "homepage": "https://github.com/jutunen/Paydown.js#readme",
+  "dependencies": {
+    "deep-equal": "^1.0.1"
+  },
+  "devDependencies": {}
+}
