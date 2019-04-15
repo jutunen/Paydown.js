@@ -1,3 +1,4 @@
+[![npm version](https://badge.fury.io/js/paydown.svg)](https://badge.fury.io/js/paydown)
 # Paydown.js
 Loan payment calculation library with advanced features.
 ## Features
