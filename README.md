@@ -157,9 +157,10 @@ Use import buttons to get the input values and then click Calculate.
 ## Documentation
 
 ### Invoking the calculation
-
+```javascript
 Paydown.calculate(init_data, events, payments)
-
+```
+The calculate method can be considered as pure, Paydown object doesn't preserve any state after it has been called.
 #### Method arguments
 
 Argument|Direction|Type|Optional|Description
