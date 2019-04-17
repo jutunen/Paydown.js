@@ -27,7 +27,6 @@ const events_3 = [{"date":"01.07.2019","pay_reduction":5000}]
 
 const rval_3 = {"sum_of_interests":889.58,"sum_of_reductions":5000,"sum_of_installments":5758.33,"remaining_principal":45000,"days_calculated":217,"actual_end_date":"05.08.2019","latest_payment_date":"01.07.2019","unpaid_interest":131.25}
 
-//const out_3 = [["01.01.2019",3,"-","-","-",50000],["01.07.2019",3,5758.33,5000,758.33,45000,""],["05.08.2019",3,"-","-",131.25,45000]]
 const out_3 = [["01.01.2019",3,"-","-","-",50000],["01.07.2019",3,5758.33,5000,758.33,45000],["05.08.2019",3,"-","-",131.25,45000]]
 
 // 4. == rel_tests_2/rel_test_1.html
@@ -49,7 +48,6 @@ const events_5 = []
 const rval_5 = {"sum_of_interests":4882.06,"sum_of_reductions":6781.47,"sum_of_installments":10000,"remaining_principal":998218.53,"days_calculated":79,"actual_end_date":"28.02.2022","latest_payment_date":"01.02.2022","unpaid_interest":1663.53}
 
 const out_5 = [["12.12.2021",2.222,"-","-","-",1005000],["01.01.2022",2.222,5000,3697.35,1302.65,1001302.65],["01.02.2022",2.222,5000,3084.12,1915.88,998218.53],["28.02.2022",2.222,"-","-",1663.53,998218.53]]
-
 
 // 6. == rel_tests/rel_test_20.html
 
