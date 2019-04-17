@@ -219,7 +219,7 @@ If Paydown.calculate method is provided with an array as its 3rd argument, the a
     [ date, interest rate, installment, principal reduction, interest, remaining principal ]
 
 ## To Do
-- test scripts
+- more tests
 - better input validation
 - better documentation
 - more day count methods
