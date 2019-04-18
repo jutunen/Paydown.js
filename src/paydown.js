@@ -3,7 +3,7 @@
 /* eslint-disable indent */
 
 function Paydown () {
-  this.calculate = function (init_obj, events_array, payments_array) {
+  this.calculate = function (init_obj, events_array, payments_array, debug_array) {
     var paydown = new _Paydown()
 
     paydown.set_init(init_obj)
@@ -23,7 +23,7 @@ function Paydown () {
     var interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest
 
     try {
-      [interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest] = paydown.calculate_to_date(last_date, payments_array)
+      [interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest] = paydown.calculate_to_date(last_date, payments_array, debug_array)
     } catch (err) {
       throw (err)
     }
@@ -53,16 +53,17 @@ function _Paydown () {
   this.g_p_i_sum_of_interests = 0
   this.total_number_of_days = 0
   this.g_p_i_total_days = 0
-  this.payment_log = []
+  this.payment_log_array = []
+  this.debug_log_array = []
   this.day_count_divisor = 0
   this.latest_period_end_date = 0
   this.init = {}
   this.round_values = true
 
-  this.func_round = function (input) {
+  this.round = function (input) {
 
     if (typeof input !== 'number') {
-      throw 'Error: this.func_round illegal parameter type'
+      throw 'Error: this.round illegal parameter type'
     }
     if (this.round_values) {
       input = Math.round(input * 100) / 100
@@ -76,7 +77,7 @@ function _Paydown () {
       if (payment[0].length !== 10) {
         payment[0] = zero_fill_date(payment[0])
       }
-      this.payment_log.push(payment)
+      this.payment_log_array.push(payment)
     }
   }
 
@@ -101,7 +102,12 @@ function _Paydown () {
       }
     }
 
-    this.total_number_of_days += calculate_day_count(start_date, end_date)
+    var totalNumberOfDays = calculate_day_count(start_date, end_date)
+    this.total_number_of_days += totalNumberOfDays
+
+    if( this.debug_logging_enabled ) {
+      this.debug_log_period_start(start_date, totalNumberOfDays, principal, rate)
+    }
 
     rate_event = this.check_if_date_has_event('rate', start_date)
     if (rate_event) {
@@ -112,7 +118,7 @@ function _Paydown () {
                         '-',
                         '-',
                         '-',
-                        this.func_round(this.current_principal)])
+                        this.round(principal)])
     }
 
     // lets check if interest rate changes during period
@@ -130,6 +136,9 @@ function _Paydown () {
         this.g_p_i_total_days += number_of_days
         factor = number_of_days / this.day_count_divisor
         subperiod_interest = principal * (current_rate / 100) * factor
+        if( this.debug_logging_enabled ) {
+          this.debug_log_subperiod(number_of_days, subperiod_interest, rate_event.date, rate_event.rate )
+        }
         sum_of_interests += subperiod_interest
         current_rate = rate_event.rate
         this.log_payment([rate_event.date,
@@ -137,7 +146,7 @@ function _Paydown () {
                           '-',
                           '-',
                           '-',
-                          this.func_round(this.current_principal)])
+                          this.round(principal)])
         rate_event = this.get_first_event_after_date('rate', rate_event_date, end_date)
         subperiod_start_date = rate_event_date
         if (rate_event) {
@@ -150,6 +159,9 @@ function _Paydown () {
       this.g_p_i_total_days += number_of_days
       factor = number_of_days / this.day_count_divisor
       subperiod_interest = principal * (current_rate / 100) * factor
+      if( this.debug_logging_enabled ) {
+        this.debug_log_subperiod(number_of_days, subperiod_interest)
+      }
       sum_of_interests += subperiod_interest
       this.current_rate = current_rate
     } else {
@@ -157,10 +169,16 @@ function _Paydown () {
       this.g_p_i_total_days += number_of_days
       factor = number_of_days / this.day_count_divisor
       subperiod_interest = principal * (rate / 100) * factor
+      if( this.debug_logging_enabled ) {
+        this.debug_log("Period daily interest: ", subperiod_interest/number_of_days)
+      }
       sum_of_interests += subperiod_interest
       this.current_rate = rate
     }
 
+    if( this.debug_logging_enabled ) {
+      this.debug_log("Period total interest: ", sum_of_interests)
+    }
     this.g_p_i_sum_of_interests += sum_of_interests
     this.latest_period_end_date = end_date
 
@@ -214,14 +232,14 @@ function _Paydown () {
     // this.current_principal should be negative or zero here:
     reduction += this.current_principal
 
-    installment = this.func_round(reduction + period_interest)
+    installment = this.round(reduction + period_interest)
 
     this.sum_of_reductions += reduction
     this.log_payment([date,
                       this.current_rate,
                       installment,
-                      this.func_round(reduction),
-                      this.func_round(period_interest),
+                      this.round(reduction),
+                      this.round(period_interest),
                       0])
     this.current_principal = 0
     this.latest_payment_date = date
@@ -250,7 +268,7 @@ function _Paydown () {
 
     if (reduction < 0) {
       // installment is smaller than the interest
-      throw 'Exception: installment ' + this.func_round(installment) + ' is too small to cover the interest ' + this.func_round(period_interest) + ': ' + start_date + ' - ' + end_date
+      throw 'Exception: installment ' + this.round(installment) + ' is too small to cover the interest ' + this.round(period_interest) + ': ' + start_date + ' - ' + end_date
     }
 
     this.sum_of_interests += period_interest
@@ -267,11 +285,10 @@ function _Paydown () {
 
     this.log_payment([this.event_array[index].date,
                       this.current_rate,
-                      this.func_round(reduction + period_interest),
-                      this.func_round(reduction),
-                      this.func_round(period_interest),
-                      this.func_round(this.current_principal)])
-
+                      this.round(reduction + period_interest),
+                      this.round(reduction),
+                      this.round(period_interest),
+                      this.round(this.current_principal)])
     return true
   }
 
@@ -304,14 +321,14 @@ function _Paydown () {
 
     this.log_payment([this.event_array[index].date,
                       this.current_rate,
-                      this.func_round(reduction + period_interest),
-                      this.func_round(reduction),
-                      this.func_round(period_interest),
-                      this.func_round(this.current_principal)])
+                      this.round(reduction + period_interest),
+                      this.round(reduction),
+                      this.round(period_interest),
+                      this.round(this.current_principal)])
     return true
   }
 
-  this.calculate_to_date = function (end_date, array_of_events) {
+  this.calculate_to_date = function (end_date, array_of_events, array_of_debug_prints) {
     var index
     var period_interest
     var reduction, installment
@@ -321,10 +338,18 @@ function _Paydown () {
     if (this.init.principal === 0) { throw 'Error: principal is missing' }
     if (typeof this.init.rate !== 'number' || isNaN(this.init.rate)) { throw 'Error: rate must be number' }
 
+    // array_of_events is an output parameter
     if (Array.isArray(array_of_events)) {
       this.payment_logging_enabled = true
     } else {
       this.payment_logging_enabled = false
+    }
+
+    // array_of_debug_prints is an output parameter
+    if (Array.isArray(array_of_debug_prints)) {
+      this.debug_print_to_console = false
+    } else {
+      this.debug_print_to_console = true
     }
 
     this.sum_of_interests = 0
@@ -421,8 +446,8 @@ function _Paydown () {
                                 this.current_rate,
                                 '-',
                                 '-',
-                                this.func_round(final_interest),
-                                this.func_round(this.current_principal)])
+                                this.round(final_interest),
+                                this.round(this.current_principal)])
               this.latest_calculated_interest_date = end_date
             } else {
               this.latest_calculated_interest_date = this.latest_payment_date
@@ -432,8 +457,8 @@ function _Paydown () {
       }
     }
 
-    if (this.func_round(this.g_p_i_sum_of_interests) !== this.func_round(this.sum_of_interests)) {
-      throw_unexpected_exception('Sum of interests mismatch: ' + this.func_round(this.g_p_i_sum_of_interests) + ' vs. ' + this.func_round(this.sum_of_interests))
+    if (this.round(this.g_p_i_sum_of_interests) !== this.round(this.sum_of_interests)) {
+      throw_unexpected_exception('Sum of interests mismatch: ' + this.round(this.g_p_i_sum_of_interests) + ' vs. ' + this.round(this.sum_of_interests))
     }
 
     if (this.g_p_i_total_days !== this.total_number_of_days) {
@@ -441,17 +466,23 @@ function _Paydown () {
     }
 
     if (this.payment_logging_enabled) {
-      for (let i = 0; i < this.payment_log.length; i++) {
-        array_of_events.push(this.payment_log[i])
+      for (let i = 0; i < this.payment_log_array.length; i++) {
+        array_of_events.push(this.payment_log_array[i])
       }
     }
 
-    return [this.func_round(this.sum_of_interests),
-            this.func_round(this.sum_of_reductions),
-            this.func_round(this.current_principal),
+    if (this.debug_logging_enabled && !this.debug_print_to_console) {
+      for (let i = 0; i < this.debug_log_array.length; i++) {
+        array_of_debug_prints.push(this.debug_log_array[i])
+      }
+    }
+
+    return [this.round(this.sum_of_interests),
+            this.round(this.sum_of_reductions),
+            this.round(this.current_principal),
             this.latest_calculated_interest_date,
             this.latest_payment_date,
-            this.func_round(final_interest)]
+            this.round(final_interest)]
   }
 
   this.set_init = function (data) {
@@ -485,6 +516,11 @@ function _Paydown () {
       this.round_values = true
     }
 
+    if (data.hasOwnProperty('debug_printing')) {
+      this.debug_logging_enabled = data.debug_printing
+    } else {
+      this.debug_logging_enabled = false
+    }
   }
 
   this.add_event = function (event) {
@@ -535,6 +571,34 @@ function _Paydown () {
     }
 
     this.event_array.sort(event_array_sorter)
+  }
+
+  this.debug_log_period_start = function (start_date, totalNumberOfDays, principal, rate) {
+    this.debug_write("New period starts " + start_date)
+    this.debug_write("Days in period: " + totalNumberOfDays)
+    this.debug_write("Remaining principal: " + this.round(principal))
+    this.debug_write("Interest rate: " + rate)
+  }
+
+  this.debug_log_subperiod = function (number_of_days, subperiod_interest, rate_event_date, new_rate ) {
+    this.debug_write("Subperiod days: " + number_of_days)
+    this.debug_write("Subperiod daily interest: " + this.round(subperiod_interest/number_of_days))
+    this.debug_write("Subperiod total interest: " + this.round(subperiod_interest))
+    if(rate_event_date) {
+      this.debug_write("Rate changes " + rate_event_date + ", new rate is " + new_rate )
+    }
+  }
+
+  this.debug_log = function (string, number) {
+    this.debug_write(string, this.round(number))
+  }
+
+  this.debug_write = function (string, number = "") {
+    if(this.debug_print_to_console) {
+      console.log(string, number)
+    } else {
+      this.debug_log_array.push(string + number)
+    }
   }
 }
 
