@@ -516,8 +516,8 @@ function _Paydown () {
       this.round_values = true
     }
 
-    if (data.hasOwnProperty('debug_printing')) {
-      this.debug_logging_enabled = data.debug_printing
+    if (data.hasOwnProperty('debug_logging')) {
+      this.debug_logging_enabled = data.debug_logging
     } else {
       this.debug_logging_enabled = false
     }
