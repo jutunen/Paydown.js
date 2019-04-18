@@ -158,7 +158,7 @@ Use import buttons to get the input values and then click Calculate.
 
 ### Invoking the calculation
 ```javascript
-Paydown.calculate(init_data, events, payments, debug_prints)
+Paydown.calculate(init_data, events, payments, debug_log)
 ```
 The calculate method can be considered as pure, Paydown object doesn't preserve any state after it has been called.
 #### Method arguments
@@ -168,7 +168,7 @@ Argument|Direction|Type|Optional|Description
 init_data|input|object|no|Initial calculation values
 events|input|array of objects|yes|List of changes during calculation period
 payments|output|array|yes|List of individual payments
-debug_prints|output|array|yes|Detailed info about paid interests
+debug_log|output|array|yes|Detailed info about paid interests etc.
 
 #### Init_data object properties
 
@@ -180,7 +180,7 @@ principal|number|no|Principal amount at the start date|
 rate|number|no|Interest rate at the start date|
 day_count_method|string|yes|Determines how interest accrues over time|"act/360"<br>"act/365"|"act/360"
 round_values|boolean|yes|Sets output value rounding to 2 decimals|true<br>false|true
-debug_printing|boolean|yes|Enables debug printing|true<br>false|false
+debug_logging|boolean|yes|Enables debug logging|true<br>false|false
 recurring|object|yes|Defines recurring payments|See below|
 
 #### Recurring object properties
@@ -221,13 +221,13 @@ If Paydown.calculate method is provided with an array as its 3rd argument, the a
 
     [ date, interest rate, installment, principal reduction, interest, remaining principal ]
 
-### Debug printing
+### Debug logging
 
-Debug printing can be enabled by setting init_data object property debug_printing to true.
+Debug logging can be enabled by setting init_data object property *debug_logging* to *true*.
 
-Debug prints shall be printed to an array, if Paydown.calculate method is provided with an array as its 4rd argument.
+Debug data shall be logged to an array, if Paydown.calculate method is provided with an array as its 4th argument.
 
-Debug prints shall be printed via console.log, if Paydown.calculate method is not provided with an array as its 4rd argument.
+Debug data shall be logged via console.log, if Paydown.calculate method is not provided with an array as its 4th argument.
 
 ## To Do
 - more tests
@@ -235,7 +235,6 @@ Debug prints shall be printed via console.log, if Paydown.calculate method is no
 - better documentation
 - more day count methods
 - length setting of recurring payment period
-- debug printing / verbose mode
 - loan term features
 - "interests only" payment method
 - etc.
