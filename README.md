@@ -225,9 +225,7 @@ If Paydown.calculate method is provided with an array as its 3rd argument, the a
 
 Debug logging can be enabled by setting init_data object property *debug_logging* to *true*.
 
-Debug data shall be logged to an array, if Paydown.calculate method is provided with an array as its 4th argument.
-
-Debug data shall be logged via console.log, if Paydown.calculate method is not provided with an array as its 4th argument.
+Debug data shall be logged to an array, if Paydown.calculate method is provided with an array as its 4th argument, otherwise debug data shall be logged through console.log.
 
 ## To Do
 - more tests
