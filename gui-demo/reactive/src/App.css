@@ -26,6 +26,15 @@ div.event_container{
   padding: 3px 0px;
   margin: auto;
   margin-top: 2px;
+  border: 1px solid #f2f2f2;
+}
+
+div.event_container:hover{
+  background-color: #e6e6e6;
+}
+
+div.event_container_focused{
+  border: 1px solid red;
 }
 
 div.event_container:last-child{

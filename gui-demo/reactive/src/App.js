@@ -264,49 +264,67 @@ function Buttons (props) {
   )
 }
 
-function Event (props, callback) {
-  return (
-    <div className='event_container' key={props.id}>
-      <div className='event_data'>
-        Event Date
-        <DatePicker
-          selected={props.date}
-          onChange={x => callback(x, props.id, 0)}
-          placeholderText="dd.mm.yyyy"
-          dateFormat="dd.MM.yyyy"
-          disabledKeyboardNavigation={true}
-          showMonthDropdown
-          showYearDropdown
-          dropdownMode="select"
-        />
+class Event extends Component {
+  constructor (props) {
+    super(props)
+    this.exampleRef = React.createRef()
+  }
+
+  onButtonEnter = () => {
+    this.exampleRef.current.classList.add("event_container_focused");
+  };
+
+  onButtonLeave = () => {
+    this.exampleRef.current.classList.remove("event_container_focused");
+  };
+
+  render() {
+    return (
+      <div ref={this.exampleRef} className='event_container' key={this.props.values.id}>
+        <div className='event_data'>
+          Event Date
+          <DatePicker
+            selected={this.props.values.date}
+            onChange={x => this.props.callback(x, this.props.values.id, 0)}
+            placeholderText="dd.mm.yyyy"
+            dateFormat="dd.MM.yyyy"
+            disabledKeyboardNavigation={true}
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+          />
+        </div>
+        <div className='event_data'>
+          New interest rate
+          <input type='text' value={this.props.values.rate} onChange={x => this.props.callback(x, this.props.values.id, 1)} className='amount_input_narrow' maxLength='5' />
+        </div>
+        <div className='event_data'>
+          New recurring amount
+          <input type='text' value={this.props.values.recurring_amount} onChange={x => this.props.callback(x, this.props.values.id, 2)} className='amount_input' maxLength='10' />
+        </div>
+        <div className='event_data'>
+          Single installment
+          <input type='text' value={this.props.values.pay_installment} onChange={x => this.props.callback(x, this.props.values.id, 3)} className='amount_input' maxLength='10' />
+        </div>
+        <div className='event_data'>
+          Single reduction
+          <input type='text' value={this.props.values.pay_reduction} onChange={x => this.props.callback(x, this.props.values.id, 4)} className='amount_input' maxLength='10' />
+        </div>
+        <div className='event_data'>
+          <img src={delButton} alt='Remove' height='25' width='25' onClick={x => this.props.callback(x, this.props.values.id, 5)} onMouseEnter={this.onButtonEnter} onMouseLeave={this.onButtonLeave} />
+        </div>
       </div>
-      <div className='event_data'>
-        New interest rate
-        <input type='text' value={props.rate} onChange={x => callback(x, props.id, 1)} className='amount_input_narrow' maxLength='5' />
-      </div>
-      <div className='event_data'>
-        New recurring amount
-        <input type='text' value={props.recurring_amount} onChange={x => callback(x, props.id, 2)} className='amount_input' maxLength='10' />
-      </div>
-      <div className='event_data'>
-        Single installment
-        <input type='text' value={props.pay_installment} onChange={x => callback(x, props.id, 3)} className='amount_input' maxLength='10' />
-      </div>
-      <div className='event_data'>
-        Single reduction
-        <input type='text' value={props.pay_reduction} onChange={x => callback(x, props.id, 4)} className='amount_input' maxLength='10' />
-      </div>
-      <div className='event_data'>
-        <img src={delButton} alt='Remove' height='25' width='25' onClick={x => callback(x, props.id, 5)} />
-      </div>
-    </div>
-  )
+    )
+  }
 }
 
 function Events (props) {
   return (
     <div>
-      {props.values.map(x => Event(x, props.callback))}
+      {props.values.map( (value) => {
+        return <Event values={value} callback={props.callback} />
+        })
+      }
     </div>
   )
 }
@@ -375,7 +393,7 @@ class App extends Component {
       event.pay_installment = array_ref[i].pay_installment
       event.pay_reduction = array_ref[i].pay_reduction
       event.id = get_new_id()
-      console.log("event.id: " + event.id)
+      //console.log("event.id: " + event.id)
       events.push(event)
     }
     this.setState({events: events})
@@ -589,6 +607,7 @@ class App extends Component {
   render () {
     return (
       <div>
+        {/*<div>React version: {React.version}</div>*/}
         <Form callback={this.handleInput} values={this.state} />
         <Buttons callback={this.handleButtons} />
         <Events values={this.state.events} callback={this.handleEvents} />
