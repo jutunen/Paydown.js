@@ -1,6 +1,6 @@
 [![npm version](https://badge.fury.io/js/paydown.svg)](https://badge.fury.io/js/paydown)
 # Paydown.js
-Loan payment calculation library with advanced features.
+Loan payment calculation library with advanced features. Demo available at http://51.255.43.70/paydown-demo/
 ## Features
 - freely selectable calculation period
 - daily interest calculation
@@ -29,7 +29,7 @@ var init_data =
     {
      "amount"              : 1000,
      "first_payment_date"  : "31.1.2019",
-     "payment_day"         : 31,
+     "payment_day"         : 31
     }
   }
 
@@ -88,7 +88,7 @@ var init_data =
      "amount"              : 1000,
      "payment_method"      : "equal_reduction",     
      "first_payment_date"  : "31.1.2019",
-     "payment_day"         : 31,
+     "payment_day"         : 31
     }
   }
 
@@ -152,7 +152,7 @@ console.log(JSON.stringify(rval_obj));
 
 Both examples above are available in the GUI demo, see http://51.255.43.70/paydown-demo/
 
-Use import buttons to get the input values and then click Calculate.
+Use import buttons to get the input values.
 
 ## Documentation
 
