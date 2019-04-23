@@ -15,8 +15,7 @@ Loan payment calculation library with advanced features. Demo available at http:
 ## Browser usage
 See https://github.com/jutunen/Paydown.js/tree/master/dist#browser-usage
 ## Node.js usage examples
-Following command line example scripts are available here:
-https://github.com/jutunen/Paydown.js/tree/master/examples
+Following command line scripts are available in [examples](https://github.com/jutunen/Paydown.js/tree/master/examples) directory.
 ### Basic usage
 #### Example script 1:
 ```javascript
