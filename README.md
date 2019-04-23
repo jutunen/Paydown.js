@@ -14,7 +14,10 @@ Loan payment calculation library with advanced features. Demo available at http:
 - freely settable rate changes and extra payments
 ## Browser usage
 See https://github.com/jutunen/Paydown.js/tree/master/dist#browser-usage
-## Basic node.js usage example
+## Node.js examples
+Following example scripts are available here:
+https://github.com/jutunen/Paydown.js/tree/master/examples
+### Basic usage example
 #### Sample script 1:
 ```javascript
 var Paydown = require('./paydown-node.js')
@@ -71,7 +74,7 @@ console.log( JSON.stringify( rval_obj ) );
      "latest_payment_date":"30.6.2019",
      "unpaid_interest":0}
 
-## Advanced node.js usage example
+### Advanced usage example
 #### Sample script 2:
 ```javascript
 var Paydown = require('./paydown-node.js')
