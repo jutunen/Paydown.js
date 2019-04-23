@@ -118,6 +118,10 @@ function _Paydown () {
                         this.round(principal)])
     }
 
+    if( this.debug_logging_enabled ) {
+      this.debug_log("Interest rate: " + rate)
+    }
+
     // lets check if interest rate changes during period
     rate_event = this.get_first_event_after_date('rate', start_date, end_date)
 
@@ -574,7 +578,6 @@ function _Paydown () {
     this.debug_write("New period starts " + start_date)
     this.debug_write("Days in period: " + totalNumberOfDays)
     this.debug_write("Remaining principal: " + this.round(principal))
-    this.debug_write("Interest rate: " + rate)
   }
 
   this.debug_log_subperiod = function (number_of_days, subperiod_interest, rate_event_date, new_rate ) {
@@ -587,7 +590,11 @@ function _Paydown () {
   }
 
   this.debug_log = function (string, number) {
-    this.debug_write(string, this.round(number))
+    if(!is_numeric(number)) {
+      this.debug_write(string)
+    } else {
+      this.debug_write(string, this.round(number))
+    }
   }
 
   this.debug_write = function (string, number = "") {
