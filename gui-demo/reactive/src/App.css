@@ -21,20 +21,17 @@ div.event_container{
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  width: 920px;
+  width: 840px;
   background-color: #f2f2f2;
   padding: 3px 0px;
-  margin: auto;
+  margin-left: 20px;
+  margin-right: 20px;
   margin-top: 2px;
   border: 1px solid #f2f2f2;
 }
 
 div.event_container:hover{
   background-color: #e6e6e6;
-}
-
-div.event_container_focused{
-  border: 1px solid red;
 }
 
 div.event_container:last-child{
@@ -51,7 +48,7 @@ div.event_data{
 div#heading_container{
   display: flex;
   flex-direction: column;
-  width: 960px;
+  width: 880px;
   background-color: lightgrey;
   margin: auto;
 }
@@ -61,7 +58,7 @@ div#heading_content{
   flex-wrap: wrap;
   justify-content: center;
   position: relative;
-  width: 920px;
+  width: 840px;
   background-color: #f2f2f2;
   margin-top: 20px;
   margin-left: 20px;
@@ -75,12 +72,73 @@ div#heading_content{
   font-weight: bold;
 }
 
-div#react_container {
+div#footer_container{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin: auto;
+  width:100px;
+  padding:20px;
+}
+
+div#react_container{
   display: flex;
   flex-direction: column;
-  width: 960px;
-  background-color: lightgrey;
+  align-items: center;
+}
+
+div#app_container{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
   margin: auto;
+}
+
+div#duplicator{
+  width: 230px;
+  height: 65px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgrey;
+  margin-top: 5px;
+}
+
+button#duplicate_button {
+  width: 150px;
+  margin: 1px;
+}
+
+p#duplicator_p{
+  height: 20px;
+  margin: 1px;
+}
+
+img#app_remove_button {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  z-index: 1;
+}
+
+div.calc_container_container{
+  position: relative;
+  border: 1px solid lightgrey;
+  margin: 0px 2px;
+}
+
+div.highlight_container{
+  border: 1px solid red;
+}
+
+div.calc_container{
+  display: flex;
+  flex-direction: column;
+  width: 880px;
+  margin:auto;
+  background-color: lightgrey;
   padding-bottom: 20px;
 }
 
@@ -98,9 +156,9 @@ div#output_summary_container{
   flex-wrap: wrap;
   justify-content: center;
   position: relative;
-  width: 920px;
+  width: 840px;
   background-color: #f2f2f2;
-  margin: 20px;
+  margin: 0px 20px 20px 20px;
   padding-bottom: 10px;
 }
 
@@ -131,7 +189,7 @@ div.init_data_container{
   flex-wrap: wrap;
   justify-content: center;
   position: relative;
-  width: 920px;
+  width: 840px;
   background-color: #f2f2f2;
   margin-top: 20px;
   margin-left: 20px;
@@ -143,7 +201,7 @@ div#buttons_container{
   flex-wrap: wrap;
   justify-content: space-around;
   position: relative;
-  width: 920px;
+  width: 840px;
   background-color: #f2f2f2;
   margin: 20px;
   padding: 3px 0px;

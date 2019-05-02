@@ -1,333 +1,8 @@
 import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
-import DatePicker from 'react-datepicker';
-import Paydown from 'paydown';
-import './react-datepicker.css';
 import './App.css';
-import delButton from './delete-button.png';
-
-var g_event_id_counter
-
-function Form (props) {
-  return (
-    <div className='init_data_container'>
-      <div data-tip data-for='startDate' className='init_data'>
-        Start date
-        <DatePicker
-          selected={props.values.startDate}
-          onChange={x => props.callback(x, 0)}
-          placeholderText="dd.mm.yyyy"
-          dateFormat="dd.MM.yyyy"
-          disabledKeyboardNavigation={true}
-          showMonthDropdown
-          showYearDropdown
-          dropdownMode="select"
-        />
-      </div>
-      <ReactTooltip id='startDate' effect='solid'>
-        <span>Calculation start date</span>
-      </ReactTooltip>
-      <div data-tip data-for='endDate' className='init_data'>
-        End date
-        <DatePicker
-          selected={props.values.endDate}
-          onChange={x => props.callback(x, 1)}
-          placeholderText="dd.mm.yyyy"
-          dateFormat="dd.MM.yyyy"
-          disabledKeyboardNavigation={true}
-          showMonthDropdown
-          showYearDropdown
-          dropdownMode="select"
-        />
-      </div>
-      <ReactTooltip id='endDate' effect='solid'>
-        <span>Calculation end date</span>
-      </ReactTooltip>
-      <div data-tip data-for='principal' className='init_data'>
-        Principal
-        <input value={props.values.principal} onChange={x => props.callback(x, 2)} type='text' className='amount_input_wide' maxLength='10' />
-      </div>
-      <ReactTooltip id='principal' effect='solid'>
-        <span>Principal amount at the start date</span>
-      </ReactTooltip>
-      <div data-tip data-for='rate' className='init_data'>
-        Rate
-        <input value={props.values.rate} onChange={x => props.callback(x, 3)} type='text' className='amount_input_narrow' maxLength='5' /> %
-      </div>
-      <ReactTooltip id='rate' effect='solid'>
-        <span>Interest rate at the start date</span>
-      </ReactTooltip>
-      <div data-tip data-for='dayCountMethod' className='init_data'>
-        Day count method
-        <select value={props.values.dayCountMethod} onChange={x => props.callback(x, 4)}>
-          <option value='act/360'>Act/360</option>
-          <option value='act/365'>Act/365</option>
-        </select>
-      </div>
-      <ReactTooltip id='dayCountMethod' effect='solid'>
-        <span>Determines how interest accrues over time</span>
-      </ReactTooltip>
-      <div data-tip data-for='recurringPayment' className='init_data'>
-        Recurring payment
-        <input value={props.values.recurringPayment} onChange={x => props.callback(x, 5)} type='text' className='amount_input' maxLength='10' />
-      </div>
-      <ReactTooltip id='recurringPayment' effect='solid'>
-        <span>The amount of recurring payment</span>
-      </ReactTooltip>
-      <div data-tip data-for='paymentMethod' className='init_data'>
-        Payment method
-        <select value={props.values.paymentMethod} onChange={x => props.callback(x, 6)}>
-          <option value='equal_installment'>Equal Installment</option>
-          <option value='equal_reduction'>Equal Reduction</option>
-        </select>
-      </div>
-      <ReactTooltip id='paymentMethod' effect='solid'>
-        <span>Payment method for recurring payments</span>
-      </ReactTooltip>
-      <div data-tip data-for='firstPaymentDate' className='init_data'>
-        1st recurring payment date
-        <DatePicker
-          selected={props.values.firstPaymentDate}
-          onChange={x => props.callback(x, 7)}
-          placeholderText="dd.mm.yyyy"
-          dateFormat="dd.MM.yyyy"
-          disabledKeyboardNavigation={true}
-          showMonthDropdown
-          showYearDropdown
-          dropdownMode="select"
-        />
-      </div>
-      <ReactTooltip id='firstPaymentDate' effect='solid'>
-        <span>First recurring payment date</span>
-      </ReactTooltip>
-      <div data-tip data-for='recurringPaymentDay' className='init_data'>
-        Recurring payment day
-        <select value={props.values.recurringPaymentDay} onChange={x => props.callback(x, 8)}>
-          <option value='1'>1.</option>
-          <option value='2'>2.</option>
-          <option value='3'>3.</option>
-          <option value='4'>4.</option>
-          <option value='5'>5.</option>
-          <option value='6'>6.</option>
-          <option value='7'>7.</option>
-          <option value='8'>8.</option>
-          <option value='9'>9.</option>
-          <option value='10'>10.</option>
-          <option value='11'>11.</option>
-          <option value='12'>12.</option>
-          <option value='13'>13.</option>
-          <option value='14'>14.</option>
-          <option value='15'>15.</option>
-          <option value='16'>16.</option>
-          <option value='17'>17.</option>
-          <option value='18'>18.</option>
-          <option value='19'>19.</option>
-          <option value='20'>20.</option>
-          <option value='21'>21.</option>
-          <option value='22'>22.</option>
-          <option value='23'>23.</option>
-          <option value='24'>24.</option>
-          <option value='25'>25.</option>
-          <option value='26'>26.</option>
-          <option value='27'>27.</option>
-          <option value='28'>28.</option>
-          <option value='29'>29.</option>
-          <option value='30'>30.</option>
-          <option value='31'>last</option>
-        </select>
-      </div>
-      <ReactTooltip id='recurringPaymentDay' effect='solid'>
-        <span>Monthly payment day of the recurring payment</span>
-      </ReactTooltip>
-    </div>
-  )
-}
-
-function Summary (props) {
-  var klass = ''
-
-  if (!props.values.hasOwnProperty('sum_of_interests')) {
-    return null
-  }
-
-  if (props.error) {
-    klass = 'summary_shade'
-  }
-
-  return (
-    <div id='output_summary_container' className={klass}>
-      <div className='output_value'>
-        Sum of interests: {props.values.sum_of_interests}
-      </div>
-      <div className='output_value'>
-        Sum of reductions: {props.values.sum_of_reductions}
-      </div>
-      <div className='output_value'>
-        Sum of installments: {props.values.sum_of_installments}
-      </div>
-      <div className='output_value'>
-        Remaining principal: {props.values.remaining_principal}
-      </div>
-      <div className='output_value'>
-        Days calculated: {props.values.days_calculated}
-      </div>
-      <div className='output_value'>
-        Actual end date: {props.values.actual_end_date}
-      </div>
-      <div className='output_value'>
-        Latest payment date: {props.values.latest_payment_date}
-      </div>
-      <div className='output_value'>
-        Unpaid interest: {props.values.unpaid_interest}
-      </div>
-    </div>
-  )
-}
-
-function TableRow (props) {
-  return (
-    <tr key={get_new_id()}>
-      <td>{ props[0] }</td>
-      <td>{ props[1] }</td>
-      <td>{ props[2] }</td>
-      <td>{ props[3] }</td>
-      <td>{ props[4] }</td>
-      <td>{ props[5] }</td>
-    </tr>
-  )
-}
-
-function Table (props) {
-  var klass = ''
-
-  if (props.error) {
-    klass = 'table_shade'
-  }
-
-  if (props.values.length === 0) {
-    return null
-  }
-
-  return (
-    <table className={klass}>
-      <tr className='bold_class'>
-        <td>Date</td>
-        <td>Rate</td>
-        <td>Installment</td>
-        <td>Reduction</td>
-        <td>Interest</td>
-        <td>Principal</td>
-      </tr>
-      {props.values.map(TableRow)}
-      <tr className='bold_class'>
-        <td>Total</td>
-        <td>-</td>
-        <td>{props.sums.sum_of_installments}</td>
-        <td>{props.sums.sum_of_reductions}</td>
-        <td>{props.sums.sum_of_interests}</td>
-        <td>-</td>
-      </tr>
-    </table>
-  )
-}
-
-function Error (props) {
-  var splitted
-
-  if (props.value) {
-    splitted = props.value.split(':')
-  } else {
-    return null
-  }
-
-  return (
-    <div id='error_container'>
-      {'Fix input: ' + splitted[1]}
-    </div>
-  )
-}
-
-function Buttons (props) {
-  return (
-    <div id='buttons_container'>
-      <button onClick={() => props.callback(1)} type='button'>Add event</button>
-      <button data-tip data-for='importBasic' onClick={() => props.callback(2)} type='button'>Import basic</button>
-      <ReactTooltip id='importBasic' effect='solid'>
-        <span>Import basic example</span>
-      </ReactTooltip>
-      <button data-tip data-for='importAdvanced' onClick={() => props.callback(3)} type='button'>Import advanced</button>
-      <ReactTooltip id='importAdvanced' effect='solid'>
-        <span>Import advanced example</span>
-      </ReactTooltip>
-      <button onClick={() => props.callback(4)} type='button'>Clear all</button>
-    </div>
-  )
-}
-
-class Event extends Component {
-  constructor (props) {
-    super(props)
-    this.exampleRef = React.createRef()
-  }
-
-  onButtonEnter = () => {
-    this.exampleRef.current.classList.add("event_container_focused");
-  };
-
-  onButtonLeave = () => {
-    this.exampleRef.current.classList.remove("event_container_focused");
-  };
-
-  render() {
-    return (
-      <div ref={this.exampleRef} className='event_container' key={this.props.values.id}>
-        <div className='event_data'>
-          Event Date
-          <DatePicker
-            selected={this.props.values.date}
-            onChange={x => this.props.callback(x, this.props.values.id, 0)}
-            placeholderText="dd.mm.yyyy"
-            dateFormat="dd.MM.yyyy"
-            disabledKeyboardNavigation={true}
-            showMonthDropdown
-            showYearDropdown
-            dropdownMode="select"
-          />
-        </div>
-        <div className='event_data'>
-          New interest rate
-          <input type='text' value={this.props.values.rate} onChange={x => this.props.callback(x, this.props.values.id, 1)} className='amount_input_narrow' maxLength='5' />
-        </div>
-        <div className='event_data'>
-          New recurring amount
-          <input type='text' value={this.props.values.recurring_amount} onChange={x => this.props.callback(x, this.props.values.id, 2)} className='amount_input' maxLength='10' />
-        </div>
-        <div className='event_data'>
-          Single installment
-          <input type='text' value={this.props.values.pay_installment} onChange={x => this.props.callback(x, this.props.values.id, 3)} className='amount_input' maxLength='10' />
-        </div>
-        <div className='event_data'>
-          Single reduction
-          <input type='text' value={this.props.values.pay_reduction} onChange={x => this.props.callback(x, this.props.values.id, 4)} className='amount_input' maxLength='10' />
-        </div>
-        <div className='event_data'>
-          <img src={delButton} alt='Remove' height='25' width='25' onClick={x => this.props.callback(x, this.props.values.id, 5)} onMouseEnter={this.onButtonEnter} onMouseLeave={this.onButtonLeave} />
-        </div>
-      </div>
-    )
-  }
-}
-
-function Events (props) {
-  return (
-    <div>
-      {props.values.map( (value) => {
-        return <Event values={value} callback={props.callback} />
-        })
-      }
-    </div>
-  )
-}
+import Paydown from 'paydown'
+import { Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, get_new_id } from './AppComponents.js'
 
 class App extends Component {
   constructor (props) {
@@ -345,14 +20,36 @@ class App extends Component {
       paymentMethod: 'equal_installment',
       firstPaymentDate: null,
       recurringPaymentDay: '1',
-      events: []
+      events: [],
+      showSummary: true
     }
 
     this.handleInput = this.handleInput.bind(this)
     this.handleEvents = this.handleEvents.bind(this)
     this.handleButtons = this.handleButtons.bind(this)
+    this.getState = this.getState.bind(this)
 
-    g_event_id_counter = 0
+    this.input_data = []
+    this.payments_array = []
+    this.events_array = []
+    this.rval_obj = {}
+
+    this.appRef = React.createRef()
+  }
+
+  componentDidMount () {
+    if(this.props.initState) {
+      this.setState(this.props.initState)
+    }
+    this.props.stateGetterCb(this.getState, this.props.id)
+  }
+
+  componentWillUnmount() {
+    this.props.stateGetterCb(null, this.props.id)
+  }
+
+  getState () {
+    return this.state;
   }
 
   addEvent (obj_ref) {
@@ -393,7 +90,6 @@ class App extends Component {
       event.pay_installment = array_ref[i].pay_installment
       event.pay_reduction = array_ref[i].pay_reduction
       event.id = get_new_id()
-      //console.log("event.id: " + event.id)
       events.push(event)
     }
     this.setState({events: events})
@@ -428,6 +124,8 @@ class App extends Component {
       this.clearAll(this.importAdvanced)
     } else if (param === 4) {
       this.clearAll()
+    } else if (param === 6) {
+      this.setState({showSummary: !this.state.showSummary});
     }
   }
 
@@ -440,6 +138,10 @@ class App extends Component {
     this.setState({firstPaymentDate: ''})
     this.setState({events: []})
     this.setError('')
+    this.input_data = {}
+    this.events_array = []
+    this.rval_obj = {}
+    this.payments_array = []
     this.clearOutput(func)
   }
 
@@ -534,49 +236,48 @@ class App extends Component {
   }
 
   calculateInput () {
-    var input_data = {}
-    input_data.recurring = {}
+    this.input_data = {}
+    this.input_data.recurring = {}
     if(this.state.startDate instanceof Date) {
-      input_data.start_date = String(this.state.startDate.getDate()) + '.' + String(this.state.startDate.getMonth() + 1) + '.' + String(this.state.startDate.getFullYear())
+      this.input_data.start_date = String(this.state.startDate.getDate()) + '.' + String(this.state.startDate.getMonth() + 1) + '.' + String(this.state.startDate.getFullYear())
     } else {
       this.setError(":Invalid start date!")
       return
     }
     if(this.state.endDate instanceof Date) {
-      input_data.end_date =  String(this.state.endDate.getDate()) + '.' + String(this.state.endDate.getMonth() + 1) + '.' + String(this.state.endDate.getFullYear())
+      this.input_data.end_date =  String(this.state.endDate.getDate()) + '.' + String(this.state.endDate.getMonth() + 1) + '.' + String(this.state.endDate.getFullYear())
     } else {
       this.setError(":Invalid end date!")
       return
     }
-    input_data.principal = Number(this.state.principal)
-    input_data.rate = Number(this.state.rate)
-    input_data.day_count_method = this.state.dayCountMethod
-    input_data.recurring.amount = Number(this.state.recurringPayment)
-    input_data.recurring.payment_method = this.state.paymentMethod
+    this.input_data.principal = Number(this.state.principal)
+    this.input_data.rate = Number(this.state.rate)
+    this.input_data.day_count_method = this.state.dayCountMethod
+    this.input_data.recurring.amount = Number(this.state.recurringPayment)
+    this.input_data.recurring.payment_method = this.state.paymentMethod
     if(this.state.firstPaymentDate instanceof Date) {
-      input_data.recurring.first_payment_date = String(this.state.firstPaymentDate.getDate()) + '.' + String(this.state.firstPaymentDate.getMonth() + 1) + '.' + String(this.state.firstPaymentDate.getFullYear())
+      this.input_data.recurring.first_payment_date = String(this.state.firstPaymentDate.getDate()) + '.' + String(this.state.firstPaymentDate.getMonth() + 1) + '.' + String(this.state.firstPaymentDate.getFullYear())
     } else {
-      input_data.recurring.first_payment_date = '';
+      this.input_data.recurring.first_payment_date = '';
     }
-    input_data.recurring.payment_day = this.state.recurringPaymentDay
+    this.input_data.recurring.payment_day = this.state.recurringPaymentDay
 
     var paydown = new Paydown()
 
-    var payments_array = []
-    var events_array = []
-    var rval_obj
+    this.payments_array = []
+    this.events_array = []
 
-    this.copyEvents(events_array)
+    this.copyEvents(this.events_array)
 
     try {
-      rval_obj = paydown.calculate(input_data, events_array, payments_array)
+      this.rval_obj = paydown.calculate(this.input_data, this.events_array, this.payments_array)
     } catch (err) {
       this.setError(err)
       return
     }
     this.setError('')
-    this.setArrayValues(payments_array)
-    this.setObjectValues(rval_obj)
+    this.setArrayValues(this.payments_array)
+    this.setObjectValues(this.rval_obj)
   }
 
   setError (str) {
@@ -604,27 +305,104 @@ class App extends Component {
     }
   }
 
+  buttonHighlighter = (event, param) => {
+    if(param) {
+      this.appRef.current.classList.add("highlight_container");
+
+    } else {
+      this.appRef.current.classList.remove("highlight_container");
+    }
+  }
+
   render () {
+
     return (
-      <div>
-        {/*<div>React version: {React.version}</div>*/}
-        <Form callback={this.handleInput} values={this.state} />
-        <Buttons callback={this.handleButtons} />
-        <Events values={this.state.events} callback={this.handleEvents} />
-        <Error value={this.state.error} />
-        <Summary values={this.state.summary} error={this.state.error} />
-        <Table values={this.state.values} error={this.state.error} sums={this.state.summary} />
+      <div ref={this.appRef} className='calc_container_container'>
+        <RemoveButton id={this.props.id} visible={this.props.removable} callback={this.props.removerCb} highlightCallback={this.buttonHighlighter} />
+        <div className='calc_container'>
+          <Form callback={this.handleInput} values={this.state} />
+          <Buttons callback={this.handleButtons} checked={this.state.showSummary} />
+          <Events values={this.state.events} callback={this.handleEvents} />
+          <ErrorMsg value={this.state.error} />
+          <Summary values={this.state.summary} error={this.state.error} visible={this.state.showSummary} />
+          <Table values={this.state.values} error={this.state.error} sums={this.state.summary} />
+        </div>
       </div>
     )
   }
 }
 
-function get_new_id () {
-  return String(g_event_id_counter++)
+function Apps (props) {
+  return (
+    <>
+      {props.ids.map( (value) => {
+        return <App key={value} id={value} removable={props.ids.length > 1 ? true : false} removerCb={props.removerCb} stateGetterCb={props.stateGetterCb} initState={props.initState} />
+        })
+      }
+    </>
+  )
 }
 
-function is_numeric (n) {
-  return !isNaN(parseFloat(n)) && isFinite(n)
+function Duplicator (props) {
+
+  if(props.visible !== true) {
+    return null
+  }
+  return (
+    <div id='duplicator'>
+      <p id='duplicator_p'>One calculator isn't enough?</p>
+      <button onClick={props.callback} id='duplicate_button'>Make it double!</button>
+    </div>
+  )
+}
+
+class AppContainer extends Component {
+  constructor (props) {
+    super(props)
+    this.state = { appIds: [0] }
+    this.newAppId = 1
+    this.duplicateApp = this.duplicateApp.bind(this)
+    this.removeApp = this.removeApp.bind(this)
+    this.getStateGetterFunction = this.getStateGetterFunction.bind(this)
+    this.copyOfState = null
+    this.stateGetters = []
+
+    window.g_event_id_counter = 0
+  }
+
+  getStateGetterFunction(stateGetter, id) {
+    if(stateGetter !== null) {
+      this.stateGetters.push({function:stateGetter, id:id})
+    } else {
+      let indexToBeRemoved = this.stateGetters.findIndex(x => { if(x.id === id) {return true}; return false }  )
+      this.stateGetters.splice(indexToBeRemoved, 1)
+    }
+  }
+
+  duplicateApp () {
+    this.copyOfState = Object.assign({}, this.stateGetters[0].function())
+    var newIds = [...this.state.appIds]
+    newIds.push(this.newAppId++)
+    this.setState({ appIds: newIds })
+  }
+
+  removeApp (synthEvent, id) {
+    var newIds = [...this.state.appIds]
+    var index = newIds.indexOf(id)
+    newIds.splice(index, 1)
+    this.setState({ appIds: newIds })
+  }
+
+  render () {
+    return (
+      <>
+      <div id='app_container'>
+        <Apps ids={this.state.appIds} removerCb={this.removeApp} stateGetterCb={this.getStateGetterFunction} initState={this.copyOfState}/>
+      </div>
+      <Duplicator callback={this.duplicateApp} visible={this.state.appIds.length > 1 ? false : true} />
+      </>
+    )
+  }
 }
 
 function findEventById (x, event_id) {
@@ -634,4 +412,8 @@ function findEventById (x, event_id) {
   return false
 }
 
-export default App;
+function is_numeric (n) {
+  return !isNaN(parseFloat(n)) && isFinite(n)
+}
+
+export default AppContainer;
