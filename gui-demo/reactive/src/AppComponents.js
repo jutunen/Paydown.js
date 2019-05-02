@@ -338,8 +338,6 @@ export class RemoveButton extends Component {
   }
 
   render() {
-    console.log("rendering id: " + this.props.id)
-
     if(this.props.visible !== true) {
       return null
     }
@@ -357,6 +355,5 @@ export class RemoveButton extends Component {
 
 export function get_new_id () {
   var id = window.g_event_id_counter++
-  console.log("new id: " + id)
   return String(id)
 }
