@@ -31,8 +31,8 @@
     "url": "https://github.com/jutunen/Paydown.js/issues"
   },
   "homepage": "https://github.com/jutunen/Paydown.js#readme",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "deep-equal": "^1.0.1"
-  },
-  "devDependencies": {}
+  }
 }
