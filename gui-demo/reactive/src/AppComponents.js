@@ -237,9 +237,13 @@ export function ErrorMsg (props) {
     return null
   }
 
+  if(splitted.length > 1) {
+    splitted = splitted[1]
+  }
+
   return (
     <div id='error_container'>
-      {'Fix input: ' + props.value}
+      {'Fix input: ' + splitted}
     </div>
   )
 }
@@ -258,8 +262,8 @@ export function Buttons (props) {
       </ReactTooltip>
       <label>
         <div className='init_data'>
-          Show summary
           <input type='checkbox' checked={props.checked} onChange={() => props.callback(6)} />
+          Show summary
         </div>
       </label>
       <button onClick={() => props.callback(4)} type='button'>Clear all</button>
@@ -332,25 +336,20 @@ export function Events (props) {
   )
 }
 
-export class RemoveButton extends Component {
-  constructor (props) {
-    super(props)
+export function RemoveButton (props) {
+
+  if(props.visible !== true) {
+    return null
   }
 
-  render() {
-    if(this.props.visible !== true) {
-      return null
-    }
-
-    return (
-      <>
-      <img data-tip data-for='removeButton' src={delButton} id="app_remove_button" alt='Remove' height='35' width='35' onClick={x => this.props.callback(x, this.props.id)} onMouseEnter={x => this.props.highlightCallback(x,true)} onMouseLeave={x => this.props.highlightCallback(x,false)} />
-      <ReactTooltip id='removeButton' effect='solid'>
-        <span>Remove this side calculator</span>
-      </ReactTooltip>
-      </>
-    )
-  }
+  return (
+    <>
+    <img data-tip data-for='removeButton' src={delButton} id="app_remove_button" alt='Remove' height='35' width='35' onClick={x => props.callback(x, props.id)} onMouseEnter={x => props.highlightCallback(x,true)} onMouseLeave={x => props.highlightCallback(x,false)} />
+    <ReactTooltip id='removeButton' effect='solid'>
+      <span>Remove this side calculator</span>
+    </ReactTooltip>
+    </>
+  )
 }
 
 export function get_new_id () {

@@ -17,6 +17,27 @@ table {
   text-align: center;
 }
 
+
+button {
+  background-color: white;
+  border: none;
+  color: black;
+  padding: 5px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin:6px 0px;
+  box-shadow: 2px 2px 2px #888888;
+  border-radius: 3px;
+  border: 1px solid #808080;
+}
+
+button:hover {
+  text-decoration: underline;
+  border: 1px solid blue;
+}
+
 div.event_container{
   display: flex;
   flex-direction: row;
@@ -97,7 +118,7 @@ div#app_container{
 
 div#duplicator{
   width: 230px;
-  height: 65px;
+  height: 70px;
   display: flex;
   flex-direction: column;
   justify-content: center;

@@ -19,7 +19,7 @@ class App extends Component {
       recurringPayment: '',
       paymentMethod: 'equal_installment',
       firstPaymentDate: null,
-      recurringPaymentDay: '1',
+      recurringPaymentDay: 1,
       events: [],
       showSummary: true
     }
@@ -154,7 +154,7 @@ class App extends Component {
     this.setState({recurringPayment: '1000'})
     this.setState({paymentMethod: 'equal_installment'})
     this.setState({firstPaymentDate: new Date(2019,0,31)})
-    this.setState({recurringPaymentDay: '31'}, this.calculateInput)
+    this.setState({recurringPaymentDay: 31}, this.calculateInput)
   }
 
   importAdvanced () {
@@ -166,7 +166,7 @@ class App extends Component {
     this.setState({recurringPayment: '1000'})
     this.setState({paymentMethod: 'equal_reduction'})
     this.setState({firstPaymentDate: new Date(2019,0,31)})
-    this.setState({recurringPaymentDay: '31'}, this.calculateInput)
+    this.setState({recurringPaymentDay: 31}, this.calculateInput)
 
     var obj = {}
     obj.date = new Date(2019,2,15)
@@ -221,13 +221,13 @@ class App extends Component {
       if (is_numeric(this.state.events[i].rate)) {
         obj.rate = Number(this.state.events[i].rate)
       }
-      if (this.state.events[i].recurring_amount) {
+      if (is_numeric(this.state.events[i].recurring_amount)) {
         obj.recurring_amount = Number(this.state.events[i].recurring_amount)
       }
-      if (this.state.events[i].pay_installment) {
+      if (is_numeric(this.state.events[i].pay_installment)) {
         obj.pay_installment = Number(this.state.events[i].pay_installment)
       }
-      if (this.state.events[i].pay_reduction) {
+      if (is_numeric(this.state.events[i].pay_reduction)) {
         obj.pay_reduction = Number(this.state.events[i].pay_reduction)
       }
       array_ref.push(Object.assign({}, obj))
@@ -272,7 +272,7 @@ class App extends Component {
     try {
       this.rval_obj = paydown.calculate(this.input_data, this.events_array, this.payments_array)
     } catch (err) {
-      this.setError(err)
+      this.setError(err.message)
       return
     }
     this.setError('')
