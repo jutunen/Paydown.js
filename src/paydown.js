@@ -15,15 +15,13 @@ function Paydown () {
     }
 
     while (local_array[0]) {
-      paydown.add_event(local_array.shift())
+      paydown.check_and_add_event(local_array.shift())
     }
-
-    var last_date = init_obj.end_date
 
     var interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest
 
     try {
-      [interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest] = paydown.calculate_to_date(last_date, payments_array, debug_array)
+      [interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest] = paydown.calculate_to_date(payments_array, debug_array)
     } catch (err) {
       throw (err)
     }
@@ -219,15 +217,15 @@ function _Paydown () {
     }
 
     if(!date) {
-      throw new Error('this.check_date ' + context + ' date is missing')
+      throw new Error('this.check_date: ' + context + ' date is missing')
     }
 
     if (typeof date !== 'string') {
-      throw new Error('this.check_date ' + context + ' date must be of type string: ' + date)
+      throw new Error('this.check_date: ' + context + ' date must be of type string: ' + date)
     }
 
     if(!check_date_validity(date)) {
-      throw new Error('this.check_date ' + context + ' date is invalid: ' + date)
+      throw new Error('this.check_date: ' + context + ' date is invalid: ' + date)
     }
   }
 
@@ -332,7 +330,7 @@ function _Paydown () {
     return true
   }
 
-  this.calculate_to_date = function (end_date, array_of_events, array_of_debug_prints) {
+  this.calculate_to_date = function (array_of_events, array_of_debug_prints) {
     var index
     var period_interest
     var reduction, installment
@@ -364,17 +362,17 @@ function _Paydown () {
 
     this.check_date(this.init.start_date, "start")
     this.check_date(this.init.end_date, "end")
-    if(this.init.amount) {
-      this.check_first_payment_date();
-    }
 
     if (is_numeric(this.init.amount) && this.init.amount > 0) {
-      this.generate_payment_events_till(end_date)
+      this.check_first_payment_date();
+      this.generate_payment_events_till(this.init.end_date)
     }
 
-    this.add_event({ date: end_date, ending: true })
+    this.add_event({ date: this.init.end_date, ending: true })
 
     this.merge_events()
+
+    this.check_events()
 
     if (this.init.day_count_method === 'act/360') {
       this.day_count_divisor = 360
@@ -452,7 +450,7 @@ function _Paydown () {
                                 '-',
                                 this.round(final_interest),
                                 this.round(this.current_principal)])
-              this.latest_calculated_interest_date = end_date
+              this.latest_calculated_interest_date = this.init.end_date
             } else {
               this.latest_calculated_interest_date = this.latest_payment_date
             }
@@ -527,12 +525,44 @@ function _Paydown () {
     }
   }
 
-  this.add_event = function (event) {
+  this.check_and_add_event = function (event) {
     if (!event.hasOwnProperty('date')) {
-      throw new Error('this.add_event: date property missing from event')
+      throw new Error('this.add_event: date missing from event')
     }
 
     this.check_date(event.date,"event")
+
+    if (event.hasOwnProperty('rate')) {
+      if(typeof event.rate !== 'number' || event.rate < 0) {
+        throw new Error('this.check_and_add_event: invalid rate in event ' + event.date)
+      }
+    }
+
+    if (event.hasOwnProperty('recurring_amount')) {
+      if(typeof event.recurring_amount !== 'number' || event.recurring_amount < 0) {
+        throw new Error('this.check_and_add_event: invalid recurring_amount in event ' + event.date)
+      }
+    }
+
+    if (event.hasOwnProperty('pay_installment')) {
+      if(typeof event.pay_installment !== 'number' || event.pay_installment <= 0) {
+        throw new Error('this.check_and_add_event: invalid pay_installment in event ' + event.date)
+      }
+    }
+
+    if (event.hasOwnProperty('pay_reduction')) {
+      if(typeof event.pay_reduction !== 'number' || event.pay_reduction <= 0) {
+        throw new Error('this.check_and_add_event: invalid pay_reduction in event ' + event.date)
+      }
+    }
+
+    this.event_array.push(Object.assign({}, event))
+  }
+
+  this.add_event = function (event) {
+    if (!event.hasOwnProperty('date')) {
+      throw new Error('this.add_event: date missing from event')
+    }
 
     this.event_array.push(Object.assign({}, event))
   }
@@ -575,6 +605,14 @@ function _Paydown () {
     }
 
     this.event_array.sort(event_array_sorter)
+  }
+
+  this.check_events = function () {
+    for (var index = 0; index < this.event_array.length - 1; index++) {
+      if (date_to_integer(this.event_array[index].date) <= date_to_integer(this.init.start_date)) {
+        throw new Error('this.check_events: event date (' + this.event_array[index].date + ') before start date not allowed')
+      }
+    }
   }
 
   this.debug_log_period_start = function (start_date, totalNumberOfDays, principal, rate) {
@@ -757,6 +795,7 @@ function calculate_day_count (first_date, second_date, exclude_last_day) {
   return Math.round((date_2 - date_1) / (1000 * 60 * 60 * 24)) + last_day
 }
 
+// checks if string n is numeric
 function is_numeric (n) {
   return !isNaN(parseFloat(n)) && isFinite(n)
 }
