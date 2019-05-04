@@ -156,6 +156,8 @@ Both examples above are available in the GUI demo, see http://51.255.43.70/paydo
 
 Use import buttons to get the input values.
 
+Demo source code can be found from  [gui-demo/reactive](https://github.com/jutunen/Paydown.js/tree/master/gui-demo/reactive) directory.
+
 ## Documentation
 
 See https://github.com/jutunen/Paydown.js/tree/master/doc#documentation
