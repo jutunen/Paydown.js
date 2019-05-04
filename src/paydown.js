@@ -63,7 +63,7 @@ function _Paydown () {
   this.round = function (input) {
 
     if (typeof input !== 'number') {
-      throw 'Error: this.round illegal parameter type'
+      throw new Error('this.round illegal parameter type')
     }
     if (this.round_values) {
       input = Math.round(input * 100) / 100
@@ -86,13 +86,13 @@ function _Paydown () {
     var sum_of_interests = 0
     var rate_event
 
-    if (!principal) { throw 'Error: this.get_period_interests invalid parameter: principal' }
+    if (!principal) { throw new Error('this.get_period_interests invalid parameter: principal') }
     // rate is allowed to be zero
-    if (!start_date) { throw 'Error: this.get_period_interests invalid parameter: start_date' }
-    if (!end_date) { throw 'Error: this.get_period_interests invalid parameter: end_date' }
+    if (!start_date) { throw new Error('this.get_period_interests invalid parameter: start_date') }
+    if (!end_date) { throw new Error('this.get_period_interests invalid parameter: end_date') }
 
     if (date_to_integer(start_date) > date_to_integer(end_date)) {
-      throw 'Error: invalid date: start_date ' + start_date + ' is after end_date ' + end_date
+      throw new Error('this.get_period_interests invalid date: start_date ' + start_date + ' is after end_date ' + end_date)
     }
 
     if (this.latest_period_end_date) {
@@ -219,15 +219,15 @@ function _Paydown () {
     }
 
     if(!date) {
-      throw 'Error: ' + context + ' date is missing'
+      throw new Error('this.check_date ' + context + ' date is missing')
     }
 
     if (typeof date !== 'string') {
-      throw 'Error: ' + context + ' date must be of type string: ' + date
+      throw new Error('this.check_date ' + context + ' date must be of type string: ' + date)
     }
 
     if(!check_date_validity(date)) {
-      throw 'Error: ' + context + ' date is invalid: ' + date
+      throw new Error('this.check_date ' + context + ' date is invalid: ' + date)
     }
   }
 
@@ -272,7 +272,7 @@ function _Paydown () {
 
     if (reduction < 0) {
       // installment is smaller than the interest
-      throw 'Exception: installment ' + this.round(installment) + ' is too small to cover the interest ' + this.round(period_interest) + ': ' + start_date + ' - ' + end_date
+      throw new Error('Exception: installment ' + this.round(installment) + ' is too small to cover the interest ' + this.round(period_interest) + ': ' + start_date + ' - ' + end_date)
     }
 
     this.sum_of_interests += period_interest
@@ -338,9 +338,9 @@ function _Paydown () {
     var reduction, installment
     var final_interest = 0
 
-    if (typeof this.init.principal !== 'number' || isNaN(this.init.principal)) { throw 'Error: principal must be number' }
-    if (this.init.principal === 0) { throw 'Error: principal is missing' }
-    if (typeof this.init.rate !== 'number' || isNaN(this.init.rate)) { throw 'Error: rate must be number' }
+    if (typeof this.init.principal !== 'number' || isNaN(this.init.principal)) { throw new Error('this.calculate_to_date: principal must be number') }
+    if (this.init.principal === 0) { throw new Error('this.calculate_to_date: principal is missing') }
+    if (typeof this.init.rate !== 'number' || isNaN(this.init.rate)) { throw new Error('this.calculate_to_date: rate must be number') }
 
     // array_of_events is an output parameter
     if (Array.isArray(array_of_events)) {
@@ -381,7 +381,7 @@ function _Paydown () {
     } else if (this.init.day_count_method === 'act/365') {
       this.day_count_divisor = 365
     } else {
-      throw 'Error: invalid day count method: ' + this.init.day_count_method
+      throw new Error('invalid day count method: ' + this.init.day_count_method)
     }
 
   // rewind start date by one so that the interest gets calculated from the very beginning:
@@ -419,7 +419,7 @@ function _Paydown () {
             break
           }
         } else {
-          throw 'Error: invalid payment method: ' + this.init.payment_method
+          throw new Error('invalid payment method: ' + this.init.payment_method)
         }
       }
 
@@ -529,7 +529,7 @@ function _Paydown () {
 
   this.add_event = function (event) {
     if (!event.hasOwnProperty('date')) {
-      throw 'Error: date property missing from event'
+      throw new Error('this.add_event: date property missing from event')
     }
 
     this.check_date(event.date,"event")
@@ -555,7 +555,7 @@ function _Paydown () {
 
     this.check_date(this.init.first_payment_date,"1st recurring payment")
     if( date_to_integer(this.init.first_payment_date) <= date_to_integer(this.init.start_date) ) {
-      throw 'Error: first payment date must be after start date'
+      throw new Error('this.check_first_payment_date: first payment date must be after start date')
     }
 
   }
@@ -697,7 +697,7 @@ function _Days (init_date) {
 }
 
 function throw_unexpected_exception (string) {
-  throw 'Unexpected exception: ' + string
+  throw new Error('Unexpected exception: ' + string)
 }
 
 function event_array_sorter (a, b) {
@@ -807,3 +807,4 @@ function check_date_validity(date) {
 
   return true
 }
+
