@@ -61,6 +61,7 @@ class App extends Component {
         recurring_amount: obj_ref.recurring_amount,
         pay_installment: obj_ref.pay_installment,
         pay_reduction: obj_ref.pay_reduction,
+        payment_method: '',
         id: get_new_id()
       }
     } else {
@@ -70,6 +71,7 @@ class App extends Component {
         recurring_amount: '',
         pay_installment: '',
         pay_reduction: '',
+        payment_method: '',
         id: get_new_id()
       }
     }
@@ -89,6 +91,7 @@ class App extends Component {
       event.recurring_amount = array_ref[i].recurring_amount
       event.pay_installment = array_ref[i].pay_installment
       event.pay_reduction = array_ref[i].pay_reduction
+      event.payment_method = ''
       event.id = get_new_id()
       events.push(event)
     }
@@ -111,6 +114,8 @@ class App extends Component {
       events_clone[index].pay_reduction = synthEvent.target.value
     } else if (field_id === 5) { // remove event
       events_clone.splice(index, 1)
+    } else if (field_id === 6) { // new payment method
+      events_clone[index].payment_method = synthEvent.target.value
     }
     this.setState({events: events_clone}, this.calculateInput)
   }
@@ -174,6 +179,7 @@ class App extends Component {
     obj.recurring_amount = 1500
     obj.pay_installment = ''
     obj.pay_reduction = ''
+    obj.payment_method = ''
 
     var obj_2 = {}
     obj_2.date = new Date(2019,4,15)
@@ -181,6 +187,7 @@ class App extends Component {
     obj_2.recurring_amount = ''
     obj_2.pay_installment = ''
     obj_2.pay_reduction = 4000
+    obj.payment_method = ''
 
     var obj_array = []
     obj_array.push(obj)
@@ -229,6 +236,9 @@ class App extends Component {
       }
       if (is_numeric(this.state.events[i].pay_reduction)) {
         obj.pay_reduction = Number(this.state.events[i].pay_reduction)
+      }
+      if (this.state.events[i].payment_method) {
+        obj.payment_method = this.state.events[i].payment_method
       }
       array_ref.push(Object.assign({}, obj))
       obj = {}

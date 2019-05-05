@@ -59,6 +59,15 @@ div.event_container:last-child{
   margin-bottom: 20px;
 }
 
+div.event_descriptor{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 40px;
+  text-align:center;
+}
+
 div.event_data{
   display: flex;
   flex-direction: column;
@@ -221,6 +230,7 @@ div#buttons_container{
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
+  align-items: center;
   position: relative;
   width: 840px;
   background-color: #f2f2f2;

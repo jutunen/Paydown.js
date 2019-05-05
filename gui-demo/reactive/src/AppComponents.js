@@ -289,7 +289,7 @@ class CalcEvent extends Component {
     return (
       <div ref={this.eventRef} className='event_container'>
         <div className='event_data'>
-          Event Date
+          <div className='event_descriptor'>Event Date</div>
           <DatePicker
             selected={this.props.values.date}
             onChange={x => this.props.callback(x, this.props.values.id, 0)}
@@ -302,20 +302,28 @@ class CalcEvent extends Component {
           />
         </div>
         <div className='event_data'>
-          New interest rate
+          <div className='event_descriptor'>New interest rate</div>
           <input type='text' value={this.props.values.rate} onChange={x => this.props.callback(x, this.props.values.id, 1)} className='amount_input_narrow' maxLength='5' />
         </div>
         <div className='event_data'>
-          New recurring amount
+          <div className='event_descriptor'>New recurring amount</div>
           <input type='text' value={this.props.values.recurring_amount} onChange={x => this.props.callback(x, this.props.values.id, 2)} className='amount_input' maxLength='10' />
         </div>
         <div className='event_data'>
-          Single installment
+          <div className='event_descriptor'>Single installment</div>
           <input type='text' value={this.props.values.pay_installment} onChange={x => this.props.callback(x, this.props.values.id, 3)} className='amount_input' maxLength='10' />
         </div>
         <div className='event_data'>
-          Single reduction
+          <div className='event_descriptor'>Single reduction</div>
           <input type='text' value={this.props.values.pay_reduction} onChange={x => this.props.callback(x, this.props.values.id, 4)} className='amount_input' maxLength='10' />
+        </div>
+        <div className='event_data'>
+          <div className='event_descriptor'>New payment method</div>
+          <select value={this.props.values.payment_method} onChange={x => this.props.callback(x, this.props.values.id, 6)}>
+            <option value=''></option>
+            <option value='equal_installment'>Eq.Ins.</option>
+            <option value='equal_reduction'>Eq.Red.</option>
+          </select>
         </div>
         <div className='event_data'>
           <img src={delButton} alt='Remove' height='25' width='25' onClick={x => this.props.callback(x, this.props.values.id, 5)} onMouseEnter={this.highLightEvent} onMouseLeave={this.unhighLightEvent} />
