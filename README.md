@@ -169,7 +169,6 @@ See https://github.com/jutunen/Paydown.js/tree/master/doc#documentation
 - more day count methods
 - length setting of recurring payment period
 - loan term features
-- "interests only" payment method
 - etc.
 
 ## Contributing
