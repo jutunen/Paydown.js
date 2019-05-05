@@ -46,6 +46,7 @@ rate|number|yes|New interest rate|
 recurring_amount|number|yes|New recurring payment amount|
 pay_installment|number|yes|Individual installment payment|
 pay_reduction|number|yes|Individual principal reduction payment|
+payment_method|string|yes|New payment method|"equal_installment"<br>"equal_reduction"
 
 ### Calculation results
 
@@ -81,3 +82,7 @@ Daily interests are calculated with following rules:
 - calculation start and end date interests are always included to the calculation completely
 - payment day interest is calculated from the capital before the payment
 - interest of the rate change day is calculated with the new rate
+
+### "Interests only" recurring payments
+
+Recurring payments can be set to cover only the interests by creating an event with recurring_amount set to zero.
