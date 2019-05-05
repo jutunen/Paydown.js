@@ -8,7 +8,7 @@
     "react-dom": "^16.8.6",
     "react-scripts": "2.1.8",
     "react-tooltip": "^3.10.0",
-    "paydown": "0.0.6"
+    "paydown": "0.0.7"
   },
   "scripts": {
     "start": "react-scripts start",
