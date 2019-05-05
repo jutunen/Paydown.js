@@ -262,11 +262,12 @@ function _Paydown () {
       period_interest = this.get_period_interests(this.current_principal, this.current_rate, start_date, end_date)
     }
 
-    if (!installment) { // FIX THIS!!!
-      installment = this.current_recurring_payment
+    if (installment === 0) {
+      // pay only interests
+      reduction = 0
+    } else {
+      reduction = installment - period_interest
     }
-
-    reduction = installment - period_interest
 
     if (reduction < 0) {
       // installment is smaller than the interest
@@ -303,10 +304,6 @@ function _Paydown () {
     } else {
       // period interests have not been calculated yet
       period_interest = this.get_period_interests(this.current_principal, this.current_rate, date_obj.set_current(this.latest_calculated_interest_date).get_next(), this.event_array[index].date)
-    }
-
-    if (!reduction) {
-      reduction = this.current_recurring_payment
     }
 
     this.sum_of_interests += period_interest
@@ -363,8 +360,8 @@ function _Paydown () {
     this.check_date(this.init.start_date, "start")
     this.check_date(this.init.end_date, "end")
 
-    if (is_numeric(this.init.amount) && this.init.amount > 0) {
-      this.check_first_payment_date();
+    if (this.init.amount !== null) {
+      this.check_first_payment_date()
       this.generate_payment_events_till(this.init.end_date)
     }
 
@@ -403,17 +400,29 @@ function _Paydown () {
     for (index = 0; index < this.event_array.length; index++) {
       if (this.event_array[index].hasOwnProperty('recurring_amount')) {
         // recurring payment amount changes
+        if(this.init.amount === null) { throw new Error('Can\'t do recurring_amount: initial recurring data missing or invalid!') }
         this.current_recurring_payment = this.event_array[index].recurring_amount
       }
 
+      if (this.event_array[index].hasOwnProperty('payment_method')) {
+        if(this.event_array[index].payment_method === 'equal_installment') {
+          this.init.payment_method = 'equal_installment'
+        } else if(this.event_array[index].payment_method === 'equal_reduction') {
+          this.init.payment_method = 'equal_reduction'
+        } else {
+          throw new Error('invalid payment method in event: ' + this.event_array[index].payment_method)
+        }
+      }
+
       if (this.event_array[index].hasOwnProperty('pay_recurring')) {
+        if(this.init.amount === null) { throw new Error('Can\'t do pay_recurring: initial recurring data missing or invalid!') }
         // recurring payment transaction occurs
         if (this.init.payment_method === 'equal_installment') {
-          if (!this.func_pay_installment(index, date_obj)) {
+          if (!this.func_pay_installment(index, date_obj, this.current_recurring_payment)) {
             break
           }
         } else if (this.init.payment_method === 'equal_reduction') {
-          if (!this.func_pay_reduction(index, date_obj)) {
+          if (!this.func_pay_reduction(index, date_obj, this.current_recurring_payment)) {
             break
           }
         } else {
@@ -500,16 +509,28 @@ function _Paydown () {
     }
 
     if (data.hasOwnProperty('recurring')) {
+      if( !data.recurring.hasOwnProperty('amount') || typeof data.recurring.amount !== 'number' || data.recurring.amount < 0) {
+        throw new Error('this.set_init: invalid or missing recurring amount')
+      }
       this.init.amount = data.recurring.amount
+
+      if( !data.recurring.hasOwnProperty('first_payment_date') ) {
+        throw new Error('this.set_init: missing first recurring payment date')
+      }
       this.init.first_payment_date = data.recurring.first_payment_date
+
+      if( !data.recurring.hasOwnProperty('payment_day') || typeof data.recurring.payment_day !== 'number' || data.recurring.payment_day < 1 || data.recurring.payment_day > 31) {
+        throw new Error('this.set_init: invalid or missing first payment day')
+      }
       this.init.payment_day = data.recurring.payment_day
+
       if (data.recurring.hasOwnProperty('payment_method')) {
         this.init.payment_method = data.recurring.payment_method
       } else {
         this.init.payment_method = 'equal_installment'
         }
     } else {
-      this.init.amount = ''
+      this.init.amount = null
     }
 
     if (data.hasOwnProperty('round_values')) {
