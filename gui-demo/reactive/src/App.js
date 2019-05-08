@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
 import './App.css';
 import Paydown from 'paydown'
-import { Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, get_new_id } from './AppComponents.js'
+import { Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, get_new_id, date_obj_to_string  } from './AppComponents.js'
+import * as cloneDeep from 'lodash.clonedeep';
 
 class App extends Component {
   constructor (props) {
@@ -120,7 +121,7 @@ class App extends Component {
     this.setState({events: events_clone}, this.calculateInput)
   }
 
-  handleButtons (param) {
+  handleButtons (param, synthEvent) {
     if (param === 1) {
       this.addEvent()
     } else if (param === 2) {
@@ -131,6 +132,49 @@ class App extends Component {
       this.clearAll()
     } else if (param === 6) {
       this.setState({showSummary: !this.state.showSummary});
+    } else if (param === 7) {
+      this.handleFileImport(synthEvent)
+    }
+  }
+
+  readUploadedFile (inputFile) {
+    const fileReader = new FileReader()
+
+    return new Promise((resolve, reject) => {
+      fileReader.onerror = () => {
+        fileReader.abort()
+        reject(new DOMException("File read error."))
+      }
+
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      }
+      fileReader.readAsText(inputFile);
+    })
+  }
+
+  async handleFileImport (event) {
+    const file = event.target.files[0];
+
+    try {
+      var text = await this.readUploadedFile(file)
+      var match_array = text.match(/¤¤(\d\d)\.(\d\d)\$\$:(.*?)('>|">|<\/jspdf)(<|\n|:)/);
+      if(match_array)
+        {
+        let stateFromFile = replace_XML_entities(match_array[3]);
+        let stateAsObj = JSON.parse(stateFromFile)
+        fixObjDates(stateAsObj)
+        if(stateAsObj.events.length > 0) {
+          fixObjEventDates(stateAsObj)
+        }
+        this.setState(stateAsObj, this.calculateInput)
+        }
+      else
+        {
+        alert("File import failed!");
+        }
+    } catch (e) {
+        alert(e.message)
     }
   }
 
@@ -223,7 +267,7 @@ class App extends Component {
     var obj = {}
     for (i = 0; i < this.state.events.length; i++) {
       if (this.state.events[i].date) {
-        obj.date = String(this.state.events[i].date.getDate()) + '.' + String(this.state.events[i].date.getMonth() + 1) + '.' + String(this.state.events[i].date.getFullYear())
+        obj.date = date_obj_to_string(this.state.events[i].date)
       }
       if (is_numeric(this.state.events[i].rate)) {
         obj.rate = Number(this.state.events[i].rate)
@@ -248,29 +292,37 @@ class App extends Component {
   calculateInput () {
     this.input_data = {}
     this.input_data.recurring = {}
+
     if(this.state.startDate instanceof Date) {
-      this.input_data.start_date = String(this.state.startDate.getDate()) + '.' + String(this.state.startDate.getMonth() + 1) + '.' + String(this.state.startDate.getFullYear())
+      this.input_data.start_date = date_obj_to_string(this.state.startDate)
     } else {
       this.setError(":Invalid start date!")
       return
     }
+
     if(this.state.endDate instanceof Date) {
-      this.input_data.end_date =  String(this.state.endDate.getDate()) + '.' + String(this.state.endDate.getMonth() + 1) + '.' + String(this.state.endDate.getFullYear())
+      this.input_data.end_date =  date_obj_to_string(this.state.endDate)
     } else {
       this.setError(":Invalid end date!")
       return
     }
+
     this.input_data.principal = Number(this.state.principal)
     this.input_data.rate = Number(this.state.rate)
     this.input_data.day_count_method = this.state.dayCountMethod
-    this.input_data.recurring.amount = Number(this.state.recurringPayment)
+
     this.input_data.recurring.payment_method = this.state.paymentMethod
     if(this.state.firstPaymentDate instanceof Date) {
-      this.input_data.recurring.first_payment_date = String(this.state.firstPaymentDate.getDate()) + '.' + String(this.state.firstPaymentDate.getMonth() + 1) + '.' + String(this.state.firstPaymentDate.getFullYear())
+      this.input_data.recurring.first_payment_date = date_obj_to_string(this.state.firstPaymentDate)
     } else {
       this.input_data.recurring.first_payment_date = '';
     }
-    this.input_data.recurring.payment_day = this.state.recurringPaymentDay
+    this.input_data.recurring.payment_day = Number(this.state.recurringPaymentDay)
+    if(is_numeric(this.state.recurringPayment)) {
+      this.input_data.recurring.amount = Number(this.state.recurringPayment)
+    } else {
+      delete this.input_data.recurring
+    }
 
     var paydown = new Paydown()
 
@@ -331,11 +383,11 @@ class App extends Component {
         <RemoveButton id={this.props.id} visible={this.props.removable} callback={this.props.removerCb} highlightCallback={this.buttonHighlighter} />
         <div className='calc_container'>
           <Form callback={this.handleInput} values={this.state} />
-          <Buttons callback={this.handleButtons} checked={this.state.showSummary} />
+          <Buttons callback={this.handleButtons} checked={this.state.showSummary} id={this.props.id} />
           <Events values={this.state.events} callback={this.handleEvents} />
           <ErrorMsg value={this.state.error} />
           <Summary values={this.state.summary} error={this.state.error} visible={this.state.showSummary} />
-          <Table values={this.state.values} error={this.state.error} sums={this.state.summary} />
+          <Table values={this.state.values} error={this.state.error} sums={this.state.summary} id={this.props.id} state={this.state} />
         </div>
       </div>
     )
@@ -382,7 +434,7 @@ class AppContainer extends Component {
 
   getStateGetterFunction(stateGetter, id) {
     if(stateGetter !== null) {
-      this.stateGetters.push({function:stateGetter, id:id})
+      this.stateGetters.push({func:stateGetter, id:id})
     } else {
       let indexToBeRemoved = this.stateGetters.findIndex(x => { if(x.id === id) {return true}; return false }  )
       this.stateGetters.splice(indexToBeRemoved, 1)
@@ -390,7 +442,7 @@ class AppContainer extends Component {
   }
 
   duplicateApp () {
-    this.copyOfState = Object.assign({}, this.stateGetters[0].function())
+    this.copyOfState = cloneDeep(this.stateGetters[0].func())
     var newIds = [...this.state.appIds]
     newIds.push(this.newAppId++)
     this.setState({ appIds: newIds })
@@ -424,6 +476,39 @@ function findEventById (x, event_id) {
 
 function is_numeric (n) {
   return !isNaN(parseFloat(n)) && isFinite(n)
+}
+
+function replace_XML_entities(string)
+{
+  var temp_str = string.replace(/&gt;/g,'>');
+  var temp_str_2 = temp_str.replace(/&lt;/g,'<');
+  var temp_str_3 = temp_str_2.replace(/&amp;/g,'&');
+  var temp_str_4 = temp_str_3.replace(/&apos;/g,"'");
+  var temp_str_5 = temp_str_4.replace(/&quot;/g ,'"');
+  return temp_str_5;
+}
+
+function fixObjDates(obj) {
+  obj.startDate = stringToDate(obj.startDate)
+  obj.endDate = stringToDate(obj.endDate)
+  if(obj.firstPaymentDate) {
+    obj.firstPaymentDate = stringToDate(obj.firstPaymentDate)
+  }
+}
+
+function fixObjEventDates(obj) {
+  for( let i = 0; i < obj.events.length; i++) {
+    obj.events[i].date = stringToDate(obj.events[i].date)
+  }
+}
+
+function stringToDate( str ) {
+  var match_array = str.match(/(\d{1,2})\.(\d{1,2})\.(\d\d\d\d).*/);
+  var dateObj = new Date()
+  dateObj.setFullYear(Number(match_array[3]))
+  dateObj.setMonth(Number(match_array[2]) - 1)
+  dateObj.setDate(Number(match_array[1]))
+  return dateObj
 }
 
 export default AppContainer;

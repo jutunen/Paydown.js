@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
 import DatePicker from 'react-datepicker';
+import { saveAs } from 'file-saver';
+import * as cloneDeep from 'lodash.clonedeep';
 import './react-datepicker.css';
 import './App.css';
 import delButton from './delete-button.png';
@@ -21,7 +23,7 @@ export function Form (props) {
           dropdownMode="select"
         />
       </div>
-      <ReactTooltip id='startDate' effect='solid'>
+      <ReactTooltip id='startDate' effect='solid' delayShow={350}>
         <span>Calculation start date</span>
       </ReactTooltip>
       <div data-tip data-for='endDate' className='init_data'>
@@ -37,21 +39,21 @@ export function Form (props) {
           dropdownMode="select"
         />
       </div>
-      <ReactTooltip id='endDate' effect='solid'>
+      <ReactTooltip id='endDate' effect='solid' delayShow={350}>
         <span>Calculation end date</span>
       </ReactTooltip>
       <div data-tip data-for='principal' className='init_data'>
         Principal &nbsp;
         <input value={props.values.principal} onChange={x => props.callback(x, 2)} type='text' className='amount_input_wide' maxLength='10' />
       </div>
-      <ReactTooltip id='principal' effect='solid'>
+      <ReactTooltip id='principal' effect='solid' delayShow={350}>
         <span>Principal amount at the start date</span>
       </ReactTooltip>
       <div data-tip data-for='rate' className='init_data'>
         Rate &nbsp;
         <input value={props.values.rate} onChange={x => props.callback(x, 3)} type='text' className='amount_input_narrow' maxLength='5' /> %
       </div>
-      <ReactTooltip id='rate' effect='solid'>
+      <ReactTooltip id='rate' effect='solid' delayShow={350}>
         <span>Interest rate at the start date</span>
       </ReactTooltip>
       <div data-tip data-for='dayCountMethod' className='init_data'>
@@ -61,14 +63,14 @@ export function Form (props) {
           <option value='act/365'>Act/365</option>
         </select>
       </div>
-      <ReactTooltip id='dayCountMethod' effect='solid'>
+      <ReactTooltip id='dayCountMethod' effect='solid' delayShow={350}>
         <span>Determines how interest accrues over time</span>
       </ReactTooltip>
       <div data-tip data-for='recurringPayment' className='init_data'>
         Recurring payment &nbsp;
         <input value={props.values.recurringPayment} onChange={x => props.callback(x, 5)} type='text' className='amount_input' maxLength='10' />
       </div>
-      <ReactTooltip id='recurringPayment' effect='solid'>
+      <ReactTooltip id='recurringPayment' effect='solid' delayShow={350}>
         <span>The amount of recurring payment</span>
       </ReactTooltip>
       <div data-tip data-for='paymentMethod' className='init_data'>
@@ -78,7 +80,7 @@ export function Form (props) {
           <option value='equal_reduction'>Equal Reduction</option>
         </select>
       </div>
-      <ReactTooltip id='paymentMethod' effect='solid'>
+      <ReactTooltip id='paymentMethod' effect='solid' delayShow={350}>
         <span>Payment method for recurring payments</span>
       </ReactTooltip>
       <div data-tip data-for='firstPaymentDate' className='init_data'>
@@ -94,7 +96,7 @@ export function Form (props) {
           dropdownMode="select"
         />
       </div>
-      <ReactTooltip id='firstPaymentDate' effect='solid'>
+      <ReactTooltip id='firstPaymentDate' effect='solid' delayShow={350}>
         <span>First recurring payment date</span>
       </ReactTooltip>
       <div data-tip data-for='recurringPaymentDay' className='init_data'>
@@ -133,7 +135,7 @@ export function Form (props) {
           <option value='31'>last</option>
         </select>
       </div>
-      <ReactTooltip id='recurringPaymentDay' effect='solid'>
+      <ReactTooltip id='recurringPaymentDay' effect='solid' delayShow={350}>
         <span>Monthly payment day of the recurring payment</span>
       </ReactTooltip>
     </div>
@@ -196,35 +198,102 @@ function TableRow (props) {
 
 export function Table (props) {
   var klass = ''
+  var saveTableTooltipText = 'The saved file shall also contain the table input<br />values, which can be imported back to this calculator.'
 
   if (props.error) {
     klass = 'table_shade'
   }
 
+  var tableId = 'table_' + props.id;
+
   if (props.values.length === 0) {
     return null
   }
 
+  var saveTableToFile = () => {
+    var stateCopy = cloneDeep(props.state)
+
+    // these 2 are calculation results, therefore not needed:
+    delete stateCopy.values
+    delete stateCopy.summary
+
+    if(stateCopy.startDate instanceof Date) {
+      stateCopy.startDate = date_obj_to_string(stateCopy.startDate)
+    } else {
+      throw "Error: stateCopy.startDate is not an instance of Date"
+    }
+
+    if(stateCopy.endDate instanceof Date) {
+      stateCopy.endDate = date_obj_to_string(stateCopy.endDate)
+    } else {
+      throw "Error: stateCopy.endDate is not an instance of Date"
+    }
+
+    if(stateCopy.firstPaymentDate instanceof Date) {
+      stateCopy.firstPaymentDate = date_obj_to_string(stateCopy.firstPaymentDate)
+    }  else {
+      stateCopy.firstPaymentDate = ""
+    }
+
+    if(stateCopy.events.length > 0) {
+      for( let i = 0; i < stateCopy.events.length; i++) {
+        stateCopy.events[i].date = date_obj_to_string(stateCopy.events[i].date)
+      }
+    }
+
+    var metadata_token = '¤¤00.01$$:' // contains metadata version number
+    var metadata = replace_XML_special_chars(JSON.stringify(stateCopy))
+    metadata = metadata_token + metadata
+
+    var style = document.createElement('style');
+    style.innerHTML = '.bold_class{font-weight:bold;}table,th,td{border-spacing:0;text-align:center;font-family:Arial,Helvetica,sans-serif;border:1px solid black;}td{padding:1px 15px;min-width:100px;}'
+
+    var tableElement = document.getElementById(tableId)
+    tableElement.appendChild(style)
+
+    var data_uri = '<!DOCTYPE html>' +
+                   '<html>' +
+                   '<head>' +
+                   '<meta charset=UTF-8">' +
+                   "<meta name='paydown.js_gui' content='" + metadata + "'>" +
+                   '<meta name="format-detection" content="telephone=no">' + // without this Edge might interpret number as telephone number and style it as link
+                   '<title>' + "Loan payments" + '</title>' +
+                   '</head>' +
+                   '<body>' +
+                   tableElement.outerHTML +
+                   '</body>' +
+                   '</html>';
+
+    var blob = new Blob([data_uri], {type: "text/html;charset=utf-8"})
+    saveAs(blob, "paydown.html")
+  };
+
   return (
-    <table className={klass}>
-      <tr className='bold_class'>
-        <td>Date</td>
-        <td>Rate</td>
-        <td>Installment</td>
-        <td>Reduction</td>
-        <td>Interest</td>
-        <td>Principal</td>
-      </tr>
-      {props.values.map(TableRow)}
-      <tr className='bold_class'>
-        <td>Total</td>
-        <td>-</td>
-        <td>{props.sums.sum_of_installments}</td>
-        <td>{props.sums.sum_of_reductions}</td>
-        <td>{props.sums.sum_of_interests}</td>
-        <td>-</td>
-      </tr>
-    </table>
+    <div className='table_container'>
+      <table id={tableId} className={klass}>
+        <tr className='bold_class'>
+          <td>Date</td>
+          <td>Rate</td>
+          <td>Installment</td>
+          <td>Reduction</td>
+          <td>Interest</td>
+          <td>Principal</td>
+        </tr>
+        {props.values.map(TableRow)}
+        <tr className='bold_class'>
+          <td>Total</td>
+          <td>-</td>
+          <td>{props.sums.sum_of_installments}</td>
+          <td>{props.sums.sum_of_reductions}</td>
+          <td>{props.sums.sum_of_interests}</td>
+          <td>-</td>
+        </tr>
+      </table>
+      <div data-tip={saveTableTooltipText} data-for='saveTable' className='table_saver' onClick={saveTableToFile}>
+        Save table to file as HTML
+      </div>
+      <ReactTooltip id='saveTable' effect='solid' html={true} delayShow={350} />
+    </div>
   )
 }
 
@@ -249,17 +318,24 @@ export function ErrorMsg (props) {
 }
 
 export function Buttons (props) {
+  var fileImportTooltipText = 'When a payments table is saved to file as HTML, the<br />table input values can be imported back to this calculator.'
+
   return (
     <div id='buttons_container'>
       <button onClick={() => props.callback(1)} type='button'>Add event</button>
       <button data-tip data-for='importBasic' onClick={() => props.callback(2)} type='button'>Import basic</button>
-      <ReactTooltip id='importBasic' effect='solid'>
+      <ReactTooltip id='importBasic' effect='solid' delayShow={350}>
         <span>Import basic example</span>
       </ReactTooltip>
       <button data-tip data-for='importAdvanced' onClick={() => props.callback(3)} type='button'>Import advanced</button>
-      <ReactTooltip id='importAdvanced' effect='solid'>
+      <ReactTooltip id='importAdvanced' effect='solid' delayShow={350}>
         <span>Import advanced example</span>
       </ReactTooltip>
+      <input className='fileImport' id={'fileImport_' + props.id} type='file' accept='.html,.htm,.pdf' onChange={ x => props.callback(7, x) }></input>
+      <label data-tip={fileImportTooltipText} data-for='labelFileImport' className='fileImportLabel' htmlFor={'fileImport_' + props.id}>
+        Import from file
+      </label>
+      <ReactTooltip id='labelFileImport' effect='solid' html={true} delayShow={350} />
       <label>
         <div className='init_data'>
           <input type='checkbox' checked={props.checked} onChange={() => props.callback(6)} />
@@ -345,7 +421,6 @@ export function Events (props) {
 }
 
 export function RemoveButton (props) {
-
   if(props.visible !== true) {
     return null
   }
@@ -353,7 +428,7 @@ export function RemoveButton (props) {
   return (
     <>
     <img data-tip data-for='removeButton' src={delButton} id="app_remove_button" alt='Remove' height='35' width='35' onClick={x => props.callback(x, props.id)} onMouseEnter={x => props.highlightCallback(x,true)} onMouseLeave={x => props.highlightCallback(x,false)} />
-    <ReactTooltip id='removeButton' effect='solid'>
+    <ReactTooltip id='removeButton' effect='solid' delayShow={350}>
       <span>Remove this side calculator</span>
     </ReactTooltip>
     </>
@@ -363,4 +438,19 @@ export function RemoveButton (props) {
 export function get_new_id () {
   var id = window.g_event_id_counter++
   return String(id)
+}
+
+export function date_obj_to_string( date_obj ) {
+  var date_str = String(date_obj.getDate()) + '.' + String(date_obj.getMonth() + 1) + '.' + String(date_obj.getFullYear())
+  return date_str
+}
+
+function replace_XML_special_chars(string)
+{
+  var temp_str = string.replace(/&/g,'&amp;');
+  var temp_str_2 = temp_str.replace(/</g,'&lt;');
+  var temp_str_3 = temp_str_2.replace(/>/g,'&gt;');
+  var temp_str_4 = temp_str_3.replace(/'/g,'&apos;');
+  var temp_str_5 = temp_str_4.replace(/"/g ,'&quot;');
+  return temp_str_5;
 }

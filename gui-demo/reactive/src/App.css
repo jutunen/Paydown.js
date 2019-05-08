@@ -17,8 +17,11 @@ table {
   text-align: center;
 }
 
+input.fileImport{
+  display: none;
+}
 
-button {
+button, .fileImportLabel {
   background-color: white;
   border: none;
   color: black;
@@ -33,7 +36,7 @@ button {
   border: 1px solid #808080;
 }
 
-button:hover {
+button:hover, .fileImportLabel:hover{
   text-decoration: underline;
   border: 1px solid blue;
 }
@@ -153,6 +156,23 @@ img#app_remove_button {
   z-index: 1;
 }
 
+div.table_container{
+  position:relative;
+}
+
+div.table_saver{
+  font-size: 14px;
+  color: blue;
+  text-decoration: underline;
+  position: absolute;
+  right:45px;
+  bottom:-20px;
+}
+
+div.table_saver:hover{
+  cursor:pointer;
+}
+
 div.calc_container_container{
   position: relative;
   border: 1px solid lightgrey;
@@ -169,7 +189,7 @@ div.calc_container{
   width: 880px;
   margin:auto;
   background-color: lightgrey;
-  padding-bottom: 20px;
+  padding-bottom: 23px;
 }
 
 div#error_container{
