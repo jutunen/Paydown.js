@@ -30,10 +30,18 @@
     event.date = new Date(2019,2,15)
     event.rate = 5
     event.recurring_amount = 1500
+    event.pay_reduction = ''
+    event.pay_installment = ''
+    event.payment_method = ''
 
     var event_2 = {}
     event_2.date = new Date(2019,4,15)
     event_2.pay_reduction = 4000
+    event_2.recurring_amount = ''
+    event_2.pay_installment = ''
+    event_2.payment_method = ''
+    event_2.rate = ''
+
 
     obj.events.push(event)
     obj.events.push(event_2)
@@ -56,10 +64,20 @@ export function funcImportNoRecurringPayments () {
     var event = {}
     event.date = new Date(2019,5,30)
     event.pay_reduction = 5000
+    event.recurring_amount = ''
+    event.pay_installment = ''
+    event.payment_method = ''
+    event.rate = ''
+
 
     var event_2 = {}
     event_2.date = new Date(2019,11,31)
     event_2.pay_reduction = 5000
+    event_2.recurring_amount = ''
+    event_2.pay_installment = ''
+    event_2.payment_method = ''
+    event_2.rate = ''
+
 
     obj.events.push(event)
     obj.events.push(event_2)
@@ -82,10 +100,20 @@ export function funcImportInterestsOnlyPayments () {
     var event = {}
     event.date = new Date(2019,4,31)
     event.recurring_amount = 0
+    event.pay_reduction = ''
+    event.pay_installment = ''
+    event.payment_method = ''
+    event.rate = ''
+
 
     var event_2 = {}
     event_2.date = new Date(2019,9,31)
     event_2.recurring_amount = 1000
+    event_2.pay_reduction = ''
+    event_2.pay_installment = ''
+    event_2.payment_method = ''
+    event_2.rate = ''
+
 
     obj.events.push(event)
     obj.events.push(event_2)
