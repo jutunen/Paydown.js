@@ -56,16 +56,16 @@ Events are passed to calculator as an array of event objects. Event date based c
 
 Paydown.calculate method returns an object with following properties:
 
-Name|Description
-----|-----------
-sum_of_interests|Total sum of accrued interests during calculation period
-sum_of_reductions|Total amount of the principal reductions during calculation period
-sum_of_installments|Total sum of installments during calculation period
-remaining_principal|Remaining principal after calculation end date
-days_calculated|Number of days in the calculation period
-actual_end_date|Actual calculation end date
-latest_payment_date|Latest payment date
-unpaid_interest|Interests accrued after latest payment date
+Name|Type|Description
+----|----|-------
+sum_of_interests|number|Total sum of accrued interests during calculation period
+sum_of_reductions|number|Total amount of the principal reductions during calculation period
+sum_of_installments|number|Total sum of installments during calculation period
+remaining_principal|number|Remaining principal after calculation end date
+days_calculated|number|Number of days calculated
+actual_end_date|string|Actual calculation end date ( "dd.mm.yyyy" )
+latest_payment_date|string|Latest payment date ( "dd.mm.yyyy" )
+unpaid_interest|number|Interests accrued after latest payment date ( within calculation period )
 
 If Paydown.calculate method is provided with an array as its 3rd argument, the array contents are interpreted as follows:
 
@@ -82,7 +82,7 @@ Debug data shall be logged to an array, if Paydown.calculate method is provided 
 Daily interests are calculated with following rules:
 
 - daily interest is always calculated for the whole day with a single rate
-- daily interest is never calculated for a part of a day with multiple rates
+- daily interest is never calculated for a part of a day or with multiple rates
 - calculation start and end date interests are always included to the calculation completely
 - payment day interest is calculated from the capital before the payment
 - interest of the rate change day is calculated with the new rate
