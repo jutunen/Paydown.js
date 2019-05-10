@@ -154,9 +154,9 @@ console.log(JSON.stringify(rval_obj));
 
 Both examples above are available in the GUI demo, see http://51.255.43.70/paydown-demo/
 
-Use import buttons to get the input values.
+Use the dropdown menu to import the examples to calculator.
 
-Demo source code can be found from  [gui-demo/reactive](https://github.com/jutunen/Paydown.js/tree/master/gui-demo/reactive) directory.
+Demo source codes can be found from  [gui-demo/reactive](https://github.com/jutunen/Paydown.js/tree/master/gui-demo/reactive) directory.
 
 ## Documentation
 
