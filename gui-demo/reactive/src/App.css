@@ -34,6 +34,15 @@ button, .fileImportLabel {
   box-shadow: 2px 2px 2px #888888;
   border-radius: 3px;
   border: 1px solid #808080;
+  height: 35px;
+}
+
+.fileImportLabel {
+  padding: 0px 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 33px;
 }
 
 button:hover, .fileImportLabel:hover{
@@ -130,7 +139,7 @@ div#app_container{
 
 div#duplicator{
   width: 230px;
-  height: 70px;
+  height: 75px;
   display: flex;
   flex-direction: column;
   justify-content: center;

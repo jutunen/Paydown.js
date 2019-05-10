@@ -4,6 +4,7 @@ import './App.css';
 import Paydown from 'paydown'
 import { Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, get_new_id, date_obj_to_string  } from './AppComponents.js'
 import * as cloneDeep from 'lodash.clonedeep';
+import { funcImportBasic, funcImportAdvanced, funcImportNoRecurringPayments, funcImportInterestsOnlyPayments } from './AppExamples.js'
 
 class App extends Component {
   constructor (props) {
@@ -194,51 +195,6 @@ class App extends Component {
     this.clearOutput(func)
   }
 
-  importBasic () {
-    this.setState({startDate: new Date(2019,0,1)})
-    this.setState({endDate: new Date(2019,5,30)})
-    this.setState({principal: '100000'})
-    this.setState({rate: '3.5'})
-    this.setState({dayCountMethod: 'act/360'})
-    this.setState({recurringPayment: '1000'})
-    this.setState({paymentMethod: 'equal_installment'})
-    this.setState({firstPaymentDate: new Date(2019,0,31)})
-    this.setState({recurringPaymentDay: 31}, this.calculateInput)
-  }
-
-  importAdvanced () {
-    this.setState({startDate: new Date(2019,0,1)})
-    this.setState({endDate: new Date(2019,5,30)})
-    this.setState({principal: '100000'})
-    this.setState({rate: '3.5'})
-    this.setState({dayCountMethod: 'act/365'})
-    this.setState({recurringPayment: '1000'})
-    this.setState({paymentMethod: 'equal_reduction'})
-    this.setState({firstPaymentDate: new Date(2019,0,31)})
-    this.setState({recurringPaymentDay: 31}, this.calculateInput)
-
-    var obj = {}
-    obj.date = new Date(2019,2,15)
-    obj.rate = 5
-    obj.recurring_amount = 1500
-    obj.pay_installment = ''
-    obj.pay_reduction = ''
-    obj.payment_method = ''
-
-    var obj_2 = {}
-    obj_2.date = new Date(2019,4,15)
-    obj_2.rate = ''
-    obj_2.recurring_amount = ''
-    obj_2.pay_installment = ''
-    obj_2.pay_reduction = 4000
-    obj.payment_method = ''
-
-    var obj_array = []
-    obj_array.push(obj)
-    obj_array.push(obj_2)
-    this.addEvents(obj_array)
-  }
-
   handleInput (event, id) {
     if (id === 0) {
       this.setState({startDate: event}, this.calculateInput)
@@ -361,7 +317,8 @@ class App extends Component {
 
   clearOutput (func) {
     if (func) {
-      this.setState({ values: [], summary: {} }, func)
+      this.setState({ values: [], summary: {} })
+      this.setState(func, this.calculateInput)
     } else {
       this.setState({ values: [], summary: {} })
     }

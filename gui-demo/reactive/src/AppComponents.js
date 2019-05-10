@@ -6,6 +6,8 @@ import * as cloneDeep from 'lodash.clonedeep';
 import './react-datepicker.css';
 import './App.css';
 import delButton from './delete-button.png';
+import Dropdown from 'react-dropdown'
+import './react-dropdown-style.css'
 
 export function Form (props) {
   return (
@@ -319,18 +321,18 @@ export function ErrorMsg (props) {
 
 export function Buttons (props) {
   var fileImportTooltipText = 'When a payments table is saved to file as HTML, the<br />table input values can be imported back to this calculator.'
+  const dropdownOptions = [
+    { value: 1, label: 'Basic' },
+    { value: 2, label: 'Advanced' },
+    { value: 3, label: 'No recurring payments' },
+    { value: 4, label: 'Interests only payments' }
+  ]
 
   return (
     <div id='buttons_container'>
       <button onClick={() => props.callback(1)} type='button'>Add event</button>
-      <button data-tip data-for='importBasic' onClick={() => props.callback(2)} type='button'>Import basic</button>
-      <ReactTooltip id='importBasic' effect='solid' delayShow={350}>
-        <span>Import basic example</span>
-      </ReactTooltip>
-      <button data-tip data-for='importAdvanced' onClick={() => props.callback(3)} type='button'>Import advanced</button>
-      <ReactTooltip id='importAdvanced' effect='solid' delayShow={350}>
-        <span>Import advanced example</span>
-      </ReactTooltip>
+      <Dropdown options={dropdownOptions} onChange={(x) => props.callback(2, x)} placeholder="Import an example" />
+      {/*<button onClick={() => props.callback(5)} type='button'>Show inside I/O</button>*/}
       <input className='fileImport' id={'fileImport_' + props.id} type='file' accept='.html,.htm,.pdf' onChange={ x => props.callback(7, x) }></input>
       <label data-tip={fileImportTooltipText} data-for='labelFileImport' className='fileImportLabel' htmlFor={'fileImport_' + props.id}>
         Import from file
