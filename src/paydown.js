@@ -26,14 +26,26 @@ function Paydown () {
       throw (err)
     }
 
+    var sum_of_installments
+
+    if (init_obj.hasOwnProperty('round_values')) {
+      if( init_obj.round_values ) {
+        sum_of_installments = func_round(Number(interests + reductions - final_interest))
+      } else {
+        sum_of_installments = Number(interests + reductions - final_interest)
+      }
+    } else {
+      sum_of_installments = func_round(Number(interests + reductions - final_interest))
+    }
+
     return {
       sum_of_interests: interests,
       sum_of_reductions: reductions,
-      sum_of_installments: func_round(Number(interests + reductions - final_interest)),
+      sum_of_installments: sum_of_installments,
       remaining_principal: remaining_principal,
       days_calculated: paydown.total_number_of_days,
-      actual_end_date: actual_end_date,
-      latest_payment_date: latest_payment_date,
+      actual_end_date: zero_fill_date(actual_end_date),
+      latest_payment_date: zero_fill_date(latest_payment_date),
       unpaid_interest: final_interest
     }
   }
@@ -497,6 +509,11 @@ function _Paydown () {
   }
 
   this.set_init = function (data) {
+
+    if( !(typeof data === 'object' && data !== null) ) {
+      throw new Error('this.set_init: invalid or missing init_obj')
+    }
+
     this.init.start_date = data.start_date
     this.init.end_date = data.end_date
     this.init.principal = data.principal
