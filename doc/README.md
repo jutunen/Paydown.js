@@ -48,6 +48,10 @@ pay_installment|number|yes|Individual installment payment|
 pay_reduction|number|yes|Individual principal reduction payment|
 payment_method|string|yes|New payment method|"equal_installment"<br>"equal_reduction"
 
+#### Passing events to the calculator instance
+
+Events are passed to calculator as an array of event objects. Event date based chronological order of event objects in the array is not required, calculator shall sort the events by itself.
+
 ### Calculation results
 
 Paydown.calculate method returns an object with following properties:
