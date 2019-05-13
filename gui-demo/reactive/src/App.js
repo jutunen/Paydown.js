@@ -126,9 +126,15 @@ class App extends Component {
     if (param === 1) {
       this.addEvent()
     } else if (param === 2) {
-      this.clearAll(this.importBasic)
-    } else if (param === 3) {
-      this.clearAll(this.importAdvanced)
+      if (synthEvent.value === 1) {
+        this.clearAll(funcImportBasic)
+      } else if (synthEvent.value === 2) {
+        this.clearAll(funcImportAdvanced)
+      } else if(synthEvent.value === 3) {
+        this.clearAll(funcImportNoRecurringPayments)
+      } else if(synthEvent.value === 4) {
+        this.clearAll(funcImportInterestsOnlyPayments)
+      }
     } else if (param === 4) {
       this.clearAll()
     } else if (param === 6) {
