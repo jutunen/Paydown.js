@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
 import './App.css';
 import Paydown from 'paydown'
-import { Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, get_new_id, date_obj_to_string  } from './AppComponents.js'
+import { RawIO, Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, get_new_id, date_obj_to_string  } from './AppComponents.js'
 import * as cloneDeep from 'lodash.clonedeep';
 import { funcImportBasic, funcImportAdvanced, funcImportNoRecurringPayments, funcImportInterestsOnlyPayments } from './AppExamples.js'
 
@@ -23,7 +23,8 @@ class App extends Component {
       firstPaymentDate: null,
       recurringPaymentDay: 1,
       events: [],
-      showSummary: true
+      showSummary: true,
+      showRawIO: false
     }
 
     this.handleInput = this.handleInput.bind(this)
@@ -41,7 +42,7 @@ class App extends Component {
 
   componentDidMount () {
     if(this.props.initState) {
-      this.setState(this.props.initState)
+      this.setState(this.props.initState, this.calculateInput)
     }
     this.props.stateGetterCb(this.getState, this.props.id)
   }
@@ -129,14 +130,16 @@ class App extends Component {
       if (synthEvent.value === 1) {
         this.clearAll(funcImportBasic)
       } else if (synthEvent.value === 2) {
-        this.clearAll(funcImportAdvanced)
+        this.clearAll(funcImportAdvanced(get_new_id))
       } else if(synthEvent.value === 3) {
-        this.clearAll(funcImportNoRecurringPayments)
+        this.clearAll(funcImportNoRecurringPayments(get_new_id))
       } else if(synthEvent.value === 4) {
-        this.clearAll(funcImportInterestsOnlyPayments)
+        this.clearAll(funcImportInterestsOnlyPayments(get_new_id))
       }
     } else if (param === 4) {
       this.clearAll()
+    } else if (param === 5) {
+      this.setState({showRawIO: !this.state.showRawIO});
     } else if (param === 6) {
       this.setState({showSummary: !this.state.showSummary});
     } else if (param === 7) {
@@ -330,7 +333,7 @@ class App extends Component {
     }
   }
 
-  buttonHighlighter = (event, param) => {
+  calcHighlighter = (event, param) => {
     if(param) {
       this.appRef.current.classList.add("highlight_container");
 
@@ -343,12 +346,13 @@ class App extends Component {
 
     return (
       <div ref={this.appRef} className='calc_container_container'>
-        <RemoveButton id={this.props.id} visible={this.props.removable} callback={this.props.removerCb} highlightCallback={this.buttonHighlighter} />
+        <RemoveButton id={this.props.id} visible={this.props.removable} callback={this.props.removerCb} highlightCallback={this.calcHighlighter} />
         <div className='calc_container'>
           <Form callback={this.handleInput} values={this.state} />
-          <Buttons callback={this.handleButtons} checked={this.state.showSummary} id={this.props.id} />
+          <Buttons callback={this.handleButtons} summary={this.state.showSummary} id={this.props.id} internal={this.state.showRawIO} />
           <Events values={this.state.events} callback={this.handleEvents} />
           <ErrorMsg value={this.state.error} />
+          <RawIO error={this.state.error} init={this.input_data} events={this.events_array} rval={this.rval_obj} payments={this.payments_array} visible={this.state.showRawIO} />
           <Summary values={this.state.summary} error={this.state.error} visible={this.state.showSummary} />
           <Table values={this.state.values} error={this.state.error} sums={this.state.summary} id={this.props.id} state={this.state} />
         </div>

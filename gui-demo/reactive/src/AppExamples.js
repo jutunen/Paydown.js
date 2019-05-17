@@ -13,7 +13,7 @@
     return obj
   }
 
-  export function funcImportAdvanced () {
+  export function funcImportAdvanced (get_new_id) {
     var obj = {}
     obj.startDate = new Date(2019,0,1)
     obj.endDate = new Date(2019,5,30)
@@ -33,6 +33,7 @@
     event.pay_reduction = ''
     event.pay_installment = ''
     event.payment_method = ''
+    event.id = get_new_id()
 
     var event_2 = {}
     event_2.date = new Date(2019,4,15)
@@ -41,14 +42,14 @@
     event_2.pay_installment = ''
     event_2.payment_method = ''
     event_2.rate = ''
-
+    event_2.id = get_new_id()
 
     obj.events.push(event)
     obj.events.push(event_2)
     return obj
   }
 
-export function funcImportNoRecurringPayments () {
+export function funcImportNoRecurringPayments (get_new_id) {
     var obj = {}
     obj.startDate = new Date(2019,0,1)
     obj.endDate = new Date(2019,11,31)
@@ -68,7 +69,7 @@ export function funcImportNoRecurringPayments () {
     event.pay_installment = ''
     event.payment_method = ''
     event.rate = ''
-
+    event.id = get_new_id()
 
     var event_2 = {}
     event_2.date = new Date(2019,11,31)
@@ -77,14 +78,14 @@ export function funcImportNoRecurringPayments () {
     event_2.pay_installment = ''
     event_2.payment_method = ''
     event_2.rate = ''
-
+    event_2.id = get_new_id()
 
     obj.events.push(event)
     obj.events.push(event_2)
     return obj
   }
 
-export function funcImportInterestsOnlyPayments () {
+export function funcImportInterestsOnlyPayments (get_new_id) {
     var obj = {}
     obj.startDate = new Date(2019,0,1)
     obj.endDate = new Date(2019,11,31)
@@ -104,7 +105,7 @@ export function funcImportInterestsOnlyPayments () {
     event.pay_installment = ''
     event.payment_method = ''
     event.rate = ''
-
+    event.id = get_new_id()
 
     var event_2 = {}
     event_2.date = new Date(2019,9,31)
@@ -113,7 +114,7 @@ export function funcImportInterestsOnlyPayments () {
     event_2.pay_installment = ''
     event_2.payment_method = ''
     event_2.rate = ''
-
+    event_2.id = get_new_id()
 
     obj.events.push(event)
     obj.events.push(event_2)

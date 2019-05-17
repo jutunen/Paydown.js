@@ -221,8 +221,26 @@ div#output_summary_container{
   padding-bottom: 10px;
 }
 
-div#output_summary_container.summary_shade, .table_shade{
-  opacity: 0.2;
+div#raw_input_container{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  width: 820px;
+  background-color: #f2f2f2;
+  margin: 0px 20px 20px 20px;
+  padding: 10px;
+  overflow: hidden;
+}
+
+div#raw_input_container p{
+  font-weight: bold;
+}
+
+div#checkboxes{
+  display:flex;
+  flex-direction: column;
 }
 
 div.init_data{

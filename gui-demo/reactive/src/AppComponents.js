@@ -6,7 +6,7 @@ import * as cloneDeep from 'lodash.clonedeep';
 import './react-datepicker.css';
 import './App.css';
 import delButton from './delete-button.png';
-import Dropdown from 'react-dropdown'
+import Dropdown from './react-dropdown.js' // <--- Note that this is a local file, not an NPM package!!!
 import './react-dropdown-style.css'
 
 export function Form (props) {
@@ -145,18 +145,13 @@ export function Form (props) {
 }
 
 export function Summary (props) {
-  var klass = ''
 
-  if (!props.values.hasOwnProperty('sum_of_interests') || props.visible === false) {
+  if (!props.values.hasOwnProperty('sum_of_interests') || props.visible === false || props.error) {
     return null
   }
 
-  if (props.error) {
-    klass = 'summary_shade'
-  }
-
   return (
-    <div id='output_summary_container' className={klass}>
+    <div id='output_summary_container'>
       <div className='output_value'>
         Sum of interests: {props.values.sum_of_interests}
       </div>
@@ -199,16 +194,12 @@ function TableRow (props) {
 }
 
 export function Table (props) {
-  var klass = ''
-  var saveTableTooltipText = 'The saved file shall also contain the table input<br />values, which can be imported back to this calculator.'
 
-  if (props.error) {
-    klass = 'table_shade'
-  }
+  var saveTableTooltipText = 'The saved file shall also contain the table input<br />values, which can be imported back to this calculator.'
 
   var tableId = 'table_' + props.id;
 
-  if (props.values.length === 0) {
+  if (props.values.length === 0 || props.error) {
     return null
   }
 
@@ -272,7 +263,7 @@ export function Table (props) {
 
   return (
     <div className='table_container'>
-      <table id={tableId} className={klass}>
+      <table id={tableId}>
         <tr className='bold_class'>
           <td>Date</td>
           <td>Rate</td>
@@ -319,13 +310,33 @@ export function ErrorMsg (props) {
   )
 }
 
+export function RawIO (props) {
+
+  if (props.visible === false || props.error ) {
+    return null
+  }
+
+  return (
+    <div id='raw_input_container'>
+      <p>Init values:</p>
+      <span>{JSON.stringify(props.init,null,1)}</span>
+      <p>Events:</p>
+      <span>{JSON.stringify(props.events,null,1)}</span>
+      <p>Summary:</p>
+      <span>{JSON.stringify(props.rval,null,1)}</span>
+      <p>Payments:</p>
+      <span>{JSON.stringify(props.payments,null,1)}</span>
+    </div>
+  )
+}
+
 export function Buttons (props) {
   var fileImportTooltipText = 'When a payments table is saved to file as HTML, the<br />table input values can be imported back to this calculator.'
   const dropdownOptions = [
-    { value: 1, label: 'Basic' },
-    { value: 2, label: 'Advanced' },
-    { value: 3, label: 'No recurring payments' },
-    { value: 4, label: 'Interests only payments' }
+    { value: 1, label: 'Basic', tip: 'Example without events' },
+    { value: 2, label: 'Advanced', tip: 'Example with 2 events' },
+    { value: 3, label: 'No recurring payments', tip: 'Both payments in this<br />example are defined by events' },
+    { value: 4, label: 'Interests only payments', tip: 'Setting recurring amount to<br />zero enables interests only payments' }
   ]
 
   return (
@@ -338,12 +349,20 @@ export function Buttons (props) {
         Import from file
       </label>
       <ReactTooltip id='labelFileImport' effect='solid' html={true} delayShow={350} />
-      <label>
-        <div className='init_data'>
-          <input type='checkbox' checked={props.checked} onChange={() => props.callback(6)} />
-          Show summary
-        </div>
-      </label>
+      <div id='checkboxes'>
+        <label>
+          <div className='init_data'>
+            <input type='checkbox' checked={props.summary} onChange={() => props.callback(6)} />
+            Show summary
+          </div>
+        </label>
+        <label>
+          <div className='init_data'>
+            <input type='checkbox' checked={props.internal} onChange={() => props.callback(5)} />
+            Show raw I/O
+          </div>
+        </label>
+      </div>
       <button onClick={() => props.callback(4)} type='button'>Clear all</button>
     </div>
   )

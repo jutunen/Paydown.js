@@ -13,7 +13,7 @@
   outline: none;
   padding: 8px 52px 8px 10px;
   transition: all 200ms ease;
-  width: 250px;
+  width: 220px;
   height: 35px;
   box-shadow: 2px 2px 2px #888888;
   border-radius: 3px;
@@ -80,7 +80,7 @@
 
 .Dropdown-option:hover {
   background-color: #f2f9fc;
-  text-decoration: underline;  
+  text-decoration: underline;
 }
 
 .Dropdown-option.is-selected {
