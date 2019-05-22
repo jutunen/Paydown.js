@@ -65,7 +65,8 @@ class App extends Component {
         pay_installment: obj_ref.pay_installment,
         pay_reduction: obj_ref.pay_reduction,
         payment_method: '',
-        id: get_new_id()
+        id: get_new_id(),
+        included: true
       }
     } else {
       event = {
@@ -75,7 +76,8 @@ class App extends Component {
         pay_installment: '',
         pay_reduction: '',
         payment_method: '',
-        id: get_new_id()
+        id: get_new_id(),
+        included: true
       }
     }
     var events = [...this.state.events]
@@ -175,7 +177,7 @@ class App extends Component {
         let stateAsObj = JSON.parse(stateFromFile)
         fixObjDates(stateAsObj)
         if(stateAsObj.events.length > 0) {
-          fixObjEventDates(stateAsObj)
+          fixObjEvent(stateAsObj)
         }
         this.setState(stateAsObj, this.calculateInput)
         }
@@ -463,9 +465,13 @@ function fixObjDates(obj) {
   }
 }
 
-function fixObjEventDates(obj) {
+function fixObjEvent(obj) {
   for( let i = 0; i < obj.events.length; i++) {
     obj.events[i].date = stringToDate(obj.events[i].date)
+    if(!obj.events[i].hasOwnProperty('included')) {
+      obj.events[i].included = true
+    }
+    obj.events[i].id = get_new_id()
   }
 }
 
