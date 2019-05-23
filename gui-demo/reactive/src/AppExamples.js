@@ -34,6 +34,7 @@
     event.pay_installment = ''
     event.payment_method = ''
     event.id = get_new_id()
+    event.included = true
 
     var event_2 = {}
     event_2.date = new Date(2019,4,15)
@@ -43,6 +44,7 @@
     event_2.payment_method = ''
     event_2.rate = ''
     event_2.id = get_new_id()
+    event_2.included = true
 
     obj.events.push(event)
     obj.events.push(event_2)
@@ -70,6 +72,7 @@ export function funcImportNoRecurringPayments (get_new_id) {
     event.payment_method = ''
     event.rate = ''
     event.id = get_new_id()
+    event.included = true
 
     var event_2 = {}
     event_2.date = new Date(2019,11,31)
@@ -79,6 +82,7 @@ export function funcImportNoRecurringPayments (get_new_id) {
     event_2.payment_method = ''
     event_2.rate = ''
     event_2.id = get_new_id()
+    event_2.included = true
 
     obj.events.push(event)
     obj.events.push(event_2)
@@ -106,6 +110,7 @@ export function funcImportInterestsOnlyPayments (get_new_id) {
     event.payment_method = ''
     event.rate = ''
     event.id = get_new_id()
+    event.included = true
 
     var event_2 = {}
     event_2.date = new Date(2019,9,31)
@@ -115,6 +120,7 @@ export function funcImportInterestsOnlyPayments (get_new_id) {
     event_2.payment_method = ''
     event_2.rate = ''
     event_2.id = get_new_id()
+    event_2.included = true
 
     obj.events.push(event)
     obj.events.push(event_2)

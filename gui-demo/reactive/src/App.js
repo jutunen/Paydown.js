@@ -10,9 +10,6 @@ class App extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      values: [],
-      summary: {},
-      error: '',
       startDate: null,
       endDate: null,
       principal: '',
@@ -36,13 +33,14 @@ class App extends Component {
     this.payments_array = []
     this.events_array = []
     this.rval_obj = {}
+    this.error = ''
 
     this.appRef = React.createRef()
   }
 
   componentDidMount () {
     if(this.props.initState) {
-      this.setState(this.props.initState, this.calculateInput)
+      this.setState(this.props.initState)
     }
     this.props.stateGetterCb(this.getState, this.props.id)
   }
@@ -85,24 +83,6 @@ class App extends Component {
     this.setState({events: events})
   }
 
-  addEvents (array_ref) {
-    var event, i
-    var events = [...this.state.events]
-
-    for (i = 0; i < array_ref.length; i++) {
-      event = {}
-      event.date = array_ref[i].date
-      event.rate = array_ref[i].rate
-      event.recurring_amount = array_ref[i].recurring_amount
-      event.pay_installment = array_ref[i].pay_installment
-      event.pay_reduction = array_ref[i].pay_reduction
-      event.payment_method = ''
-      event.id = get_new_id()
-      events.push(event)
-    }
-    this.setState({events: events})
-  }
-
   handleEvents (synthEvent, event_id, field_id) {
     var events_clone = [...this.state.events]
     var index = events_clone.findIndex(x => findEventById(x, event_id))
@@ -121,8 +101,10 @@ class App extends Component {
       events_clone.splice(index, 1)
     } else if (field_id === 6) { // new payment method
       events_clone[index].payment_method = synthEvent.target.value
+    } else if (field_id === 7) { // included
+      events_clone[index].included = !events_clone[index].included
     }
-    this.setState({events: events_clone}, this.calculateInput)
+    this.setState({events: events_clone})
   }
 
   handleButtons (param, synthEvent) {
@@ -208,31 +190,35 @@ class App extends Component {
 
   handleInput (event, id) {
     if (id === 0) {
-      this.setState({startDate: event}, this.calculateInput)
+      this.setState({startDate: event})
     } else if (id === 1) {
-      this.setState({endDate: event}, this.calculateInput)
+      this.setState({endDate: event})
     } else if (id === 2) {
-      this.setState({principal: event.target.value}, this.calculateInput)
+      this.setState({principal: event.target.value})
     } else if (id === 3) {
-      this.setState({rate: event.target.value}, this.calculateInput)
+      this.setState({rate: event.target.value})
     } else if (id === 4) {
-      this.setState({dayCountMethod: event.target.value}, this.calculateInput)
+      this.setState({dayCountMethod: event.target.value})
     } else if (id === 5) {
-      this.setState({recurringPayment: event.target.value}, this.calculateInput)
+      this.setState({recurringPayment: event.target.value})
     } else if (id === 6) {
-      this.setState({paymentMethod: event.target.value}, this.calculateInput)
+      this.setState({paymentMethod: event.target.value})
     } else if (id === 7) {
-      this.setState({firstPaymentDate: event}, this.calculateInput)
+      this.setState({firstPaymentDate: event})
     } else if (id === 8) {
-      this.setState({recurringPaymentDay: event.target.value}, this.calculateInput)
+      this.setState({recurringPaymentDay: event.target.value})
     }
     ReactTooltip.hide()
   }
 
+  // copy events from App to Paydown event array
   copyEvents (array_ref) {
     var i = 0
     var obj = {}
     for (i = 0; i < this.state.events.length; i++) {
+      if (this.state.events[i].included === false) {
+        continue
+      }
       if (this.state.events[i].date) {
         obj.date = date_obj_to_string(this.state.events[i].date)
       }
@@ -305,33 +291,15 @@ class App extends Component {
       return
     }
     this.setError('')
-    this.setArrayValues(this.payments_array)
-    this.setObjectValues(this.rval_obj)
   }
 
   setError (str) {
-    this.setState({error: str})
-  }
-
-  setArrayValues (array_ref) {
-    var clonedArray = [...array_ref]
-    this.setState({
-      values: clonedArray
-    })
-  }
-
-  setObjectValues (obj_ref) {
-    this.setState({
-      summary: Object.assign({}, obj_ref)
-    })
+    this.error = str
   }
 
   clearOutput (func) {
     if (func) {
-      this.setState({ values: [], summary: {} })
-      this.setState(func, this.calculateInput)
-    } else {
-      this.setState({ values: [], summary: {} })
+      this.setState(func)
     }
   }
 
@@ -346,6 +314,8 @@ class App extends Component {
 
   render () {
 
+    this.calculateInput()
+
     return (
       <div ref={this.appRef} className='calc_container_container'>
         <RemoveButton id={this.props.id} visible={this.props.removable} callback={this.props.removerCb} highlightCallback={this.calcHighlighter} />
@@ -353,10 +323,10 @@ class App extends Component {
           <Form callback={this.handleInput} values={this.state} />
           <Buttons callback={this.handleButtons} summary={this.state.showSummary} id={this.props.id} internal={this.state.showRawIO} />
           <Events values={this.state.events} callback={this.handleEvents} />
-          <ErrorMsg value={this.state.error} />
-          <RawIO error={this.state.error} init={this.input_data} events={this.events_array} rval={this.rval_obj} payments={this.payments_array} visible={this.state.showRawIO} />
-          <Summary values={this.state.summary} error={this.state.error} visible={this.state.showSummary} />
-          <Table values={this.state.values} error={this.state.error} sums={this.state.summary} id={this.props.id} state={this.state} />
+          <ErrorMsg value={this.error} />
+          <RawIO error={this.error} init={this.input_data} events={this.events_array} rval={this.rval_obj} payments={this.payments_array} visible={this.state.showRawIO} />
+          <Summary values={this.rval_obj} error={this.error} visible={this.state.showSummary} />
+          <Table values={this.payments_array} error={this.error} sums={this.rval_obj} id={this.props.id} state={this.state} />
         </div>
       </div>
     )

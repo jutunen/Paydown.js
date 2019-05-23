@@ -206,10 +206,6 @@ export function Table (props) {
   var saveTableToFile = () => {
     var stateCopy = cloneDeep(props.state)
 
-    // these 2 are calculation results, therefore not needed:
-    delete stateCopy.values
-    delete stateCopy.summary
-
     if(stateCopy.startDate instanceof Date) {
       stateCopy.startDate = date_obj_to_string(stateCopy.startDate)
     } else {
@@ -231,6 +227,7 @@ export function Table (props) {
     if(stateCopy.events.length > 0) {
       for( let i = 0; i < stateCopy.events.length; i++) {
         stateCopy.events[i].date = date_obj_to_string(stateCopy.events[i].date)
+        delete stateCopy.events[i].id
       }
     }
 
@@ -383,44 +380,61 @@ class CalcEvent extends Component {
   };
 
   render() {
+
+    var name_of_class = 'event_inclusion_container'
+    if(this.props.included === false) {
+      name_of_class = 'event_exclusion_container'
+    }
+
+    var eventCheckboxTooltipText = 'Unchecked checkbox excludes<br />the event from the calculation.'
+
     return (
       <div ref={this.eventRef} className='event_container'>
-        <div className='event_data'>
-          <div className='event_descriptor'>Event Date</div>
-          <DatePicker
-            selected={this.props.values.date}
-            onChange={x => this.props.callback(x, this.props.values.id, 0)}
-            placeholderText="dd.mm.yyyy"
-            dateFormat="dd.MM.yyyy"
-            disabledKeyboardNavigation={true}
-            showMonthDropdown
-            showYearDropdown
-            dropdownMode="select"
-          />
-        </div>
-        <div className='event_data'>
-          <div className='event_descriptor'>New interest rate</div>
-          <input type='text' value={this.props.values.rate} onChange={x => this.props.callback(x, this.props.values.id, 1)} className='amount_input_narrow' maxLength='5' />
-        </div>
-        <div className='event_data'>
-          <div className='event_descriptor'>New recurring amount</div>
-          <input type='text' value={this.props.values.recurring_amount} onChange={x => this.props.callback(x, this.props.values.id, 2)} className='amount_input' maxLength='10' />
-        </div>
-        <div className='event_data'>
-          <div className='event_descriptor'>Single installment</div>
-          <input type='text' value={this.props.values.pay_installment} onChange={x => this.props.callback(x, this.props.values.id, 3)} className='amount_input' maxLength='10' />
-        </div>
-        <div className='event_data'>
-          <div className='event_descriptor'>Single reduction</div>
-          <input type='text' value={this.props.values.pay_reduction} onChange={x => this.props.callback(x, this.props.values.id, 4)} className='amount_input' maxLength='10' />
-        </div>
-        <div className='event_data'>
-          <div className='event_descriptor'>New payment method</div>
-          <select value={this.props.values.payment_method} onChange={x => this.props.callback(x, this.props.values.id, 6)}>
-            <option value=''></option>
-            <option value='equal_installment'>Eq.Ins.</option>
-            <option value='equal_reduction'>Eq.Red.</option>
-          </select>
+        <label data-tip={eventCheckboxTooltipText} data-for='eventCheckbox' className='event_checkbox_container'>
+          <div className='event_data'>
+            <input type='checkbox' checked={this.props.included} onChange={x => this.props.callback(x, this.props.values.id, 7)}/>
+          </div>
+        </label>
+        <ReactTooltip id='eventCheckbox' effect='solid' delayShow={350} place='right' html={true} />
+        <div className={name_of_class}>
+          <div className='event_data'>
+            <div className='event_descriptor'>Event Date</div>
+            <DatePicker
+              selected={this.props.values.date}
+              onChange={x => this.props.callback(x, this.props.values.id, 0)}
+              placeholderText="dd.mm.yyyy"
+              dateFormat="dd.MM.yyyy"
+              disabledKeyboardNavigation={true}
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+              disabled={!this.props.included}
+            />
+          </div>
+          <div className='event_data'>
+            <div className='event_descriptor'>New interest rate</div>
+            <input disabled={!this.props.included} type='text' value={this.props.values.rate} onChange={x => this.props.callback(x, this.props.values.id, 1)} className='amount_input_narrow' maxLength='5' />
+          </div>
+          <div className='event_data'>
+            <div className='event_descriptor'>New recurring amount</div>
+            <input disabled={!this.props.included} type='text' value={this.props.values.recurring_amount} onChange={x => this.props.callback(x, this.props.values.id, 2)} className='amount_input' maxLength='10' />
+          </div>
+          <div className='event_data'>
+            <div className='event_descriptor'>Single installment</div>
+            <input disabled={!this.props.included} type='text' value={this.props.values.pay_installment} onChange={x => this.props.callback(x, this.props.values.id, 3)} className='amount_input' maxLength='10' />
+          </div>
+          <div className='event_data'>
+            <div className='event_descriptor'>Single reduction</div>
+            <input disabled={!this.props.included} type='text' value={this.props.values.pay_reduction} onChange={x => this.props.callback(x, this.props.values.id, 4)} className='amount_input' maxLength='10' />
+          </div>
+          <div className='event_data'>
+            <div className='event_descriptor'>New payment method</div>
+            <select disabled={!this.props.included} value={this.props.values.payment_method} onChange={x => this.props.callback(x, this.props.values.id, 6)}>
+              <option value=''></option>
+              <option value='equal_installment'>Eq.Ins.</option>
+              <option value='equal_reduction'>Eq.Red.</option>
+            </select>
+          </div>
         </div>
         <div className='event_data'>
           <img src={delButton} alt='Remove' height='25' width='25' onClick={x => this.props.callback(x, this.props.values.id, 5)} onMouseEnter={this.highLightEvent} onMouseLeave={this.unhighLightEvent} />
@@ -434,7 +448,7 @@ export function Events (props) {
   return (
     <div>
       {props.values.map( (value) => {
-        return <CalcEvent values={value} callback={props.callback} key={value.id} />
+        return <CalcEvent values={value} callback={props.callback} key={value.id} included={value.included} />
         })
       }
     </div>
