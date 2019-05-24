@@ -791,6 +791,12 @@ function date_to_integer (date) {
 }
 
 function zero_fill_date (date) {
+  if (typeof date !== 'string') { throw new Error('zero_fill_date illegal parameter type') }
+
+  if(!date) {
+    return "N/A"
+  }
+
   var day = split_date(date)[0]
   var month = split_date(date)[1]
   var year = split_date(date)[2]
