@@ -11,7 +11,7 @@
     "react-dropdown": "^1.6.4",
     "react-scripts": "2.1.8",
     "react-tooltip": "^3.10.0",
-    "paydown": "0.0.11"
+    "paydown": "0.0.12"
   },
   "scripts": {
     "start": "react-scripts start",
