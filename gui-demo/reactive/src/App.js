@@ -216,8 +216,10 @@ class App extends Component {
     var i = 0
     var obj = {}
     for (i = 0; i < this.state.events.length; i++) {
-      if (this.state.events[i].included === false) {
-        continue
+      if( this.state.events[i].hasOwnProperty('included') ) {
+        if (this.state.events[i].included === false) {
+          continue
+        }
       }
       if (this.state.events[i].date) {
         obj.date = date_obj_to_string(this.state.events[i].date)
