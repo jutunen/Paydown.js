@@ -69,6 +69,13 @@ function _Paydown () {
   this.latest_period_end_date = 0
   this.init = {}
   this.round_values = true
+/* // these 4 are for performance analysis:
+  this.timeSpent = 0
+  this.callCount = 0
+  this.rateEventIterations = 0
+  this.mainLoopIterations = 0
+*/
+  this.rateHashMap = {}
 
   this.round = function (input) {
 
@@ -93,6 +100,11 @@ function _Paydown () {
 
   // period lasts from the beginning of start date to the end of end_date
   this.get_period_interests = function (principal, rate, start_date, end_date) {
+
+/*  // these 2 are for performance analysis:
+    this.callCount++
+    var timeBegin = Date.now();
+*/
     var sum_of_interests = 0
     var rate_event
 
@@ -119,10 +131,8 @@ function _Paydown () {
       this.debug_log_period_start(start_date, totalNumberOfDays, principal, rate)
     }
 
-    rate_event = this.check_if_date_has_event('rate', start_date)
-    if (rate_event) {
-      rate = rate_event.rate
-      rate_event = {}
+    if(this.rateHashMap.hasOwnProperty(date_to_integer(start_date))) {
+      rate = this.rateHashMap[date_to_integer(start_date)]
       this.log_payment([start_date,
                         rate,
                         '-',
@@ -145,6 +155,8 @@ function _Paydown () {
       var number_of_days, factor, subperiod_interest
 
       while (rate_event) {
+        // perf analysis:
+        // this.rateEventIterations++
         // excluding the last day of the period, so that the rate event day shall be calculated with the new rate:
         number_of_days = calculate_day_count(subperiod_start_date, rate_event_date, true)
         this.g_p_i_total_days += number_of_days
@@ -196,18 +208,23 @@ function _Paydown () {
     this.g_p_i_sum_of_interests += sum_of_interests
     this.latest_period_end_date = end_date
 
+    // these 4 are for performance analysis:
+    //var timeEnd = Date.now()
+    //var timeSpent = (timeEnd - timeBegin)
+    //this.timeSpent += timeSpent
+    //console.log(start_date + " - " + end_date + ": " + timeSpent)
+
     return sum_of_interests
   }
 
   // param property is a property of the seeked event
   this.get_first_event_after_date = function (property, date, boundary_date) {
     for (var index = 0; index < this.event_array.length; index++) {
-      if (date_to_integer(this.event_array[index].date) > date_to_integer(date) && this.event_array[index].hasOwnProperty(property)) {
-        if (!boundary_date) {
-          return this.event_array[index]
-        } else if (date_to_integer(this.event_array[index].date) <= date_to_integer(boundary_date)) {
-          return this.event_array[index]
-        }
+      if (date_to_integer(this.event_array[index].date) > date_to_integer(date) && this.event_array[index].hasOwnProperty(property) && date_to_integer(this.event_array[index].date) <= date_to_integer(boundary_date) ) {
+        return this.event_array[index]
+      }
+      if (date_to_integer(this.event_array[index].date) > date_to_integer(boundary_date)) {
+        return false
       }
     }
     return false
@@ -216,8 +233,12 @@ function _Paydown () {
   // param property is a property of the seeked event
   this.check_if_date_has_event = function (property, date) {
     for (var index = 0; index < this.event_array.length; index++) {
-      if (date_to_integer(this.event_array[index].date) === date_to_integer(date) && this.event_array[index].hasOwnProperty(property)) {
+      if (date_to_integer(this.event_array[index].date) === date_to_integer(date) ) {
+        if( this.event_array[index].hasOwnProperty(property) ) {
         return this.event_array[index]
+        } else {
+          return false
+        }
       }
     }
     return false
@@ -410,6 +431,8 @@ function _Paydown () {
     this.current_recurring_payment = this.init.amount
 
     for (index = 0; index < this.event_array.length; index++) {
+      // perf analysis:
+      // this.mainLoopIterations++
       if (this.event_array[index].hasOwnProperty('recurring_amount')) {
         // recurring payment amount changes
         if(this.init.amount === null) { throw new Error('Can\'t do recurring_amount: initial recurring data missing or invalid!') }
@@ -499,6 +522,12 @@ function _Paydown () {
         array_of_debug_prints.push(this.debug_log_array[i])
       }
     }
+
+    // these 4 are for performance analysis:
+    //console.log("this.timeSpent: " + this.timeSpent)
+    //console.log("this.callCount: " + this.callCount)
+    //console.log("this.rateEventIterations: " + this.rateEventIterations)
+    //console.log("this.mainLoopIterations: " + this.mainLoopIterations)
 
     return [this.round(this.sum_of_interests),
             this.round(this.sum_of_reductions),
@@ -610,6 +639,10 @@ function _Paydown () {
     this.event_array.sort(event_array_sorter)
 
     for (var index = 0; index < this.event_array.length - 1; index++) {
+      if(this.event_array[index].hasOwnProperty('rate')) {
+        this.rateHashMap[date_to_integer(this.event_array[index].date)] = this.event_array[index].rate
+      }
+
       if (date_to_integer(this.event_array[index].date) === date_to_integer(this.event_array[index + 1].date)) {
         // todo: here it should be checked that date property is the only common thing that the events to be merged share
         Object.assign(this.event_array[index], this.event_array[index + 1])
@@ -642,7 +675,8 @@ function _Paydown () {
       this.add_event(event)
     }
 
-    this.event_array.sort(event_array_sorter)
+    // this is likely redundant and shouldn't be needed:
+    //this.event_array.sort(event_array_sorter)
   }
 
   this.check_events = function () {
