@@ -34,6 +34,7 @@ class App extends Component {
     this.events_array = []
     this.rval_obj = {}
     this.error = ''
+    this.eventsAction = ''
 
     this.appRef = React.createRef()
   }
@@ -41,6 +42,7 @@ class App extends Component {
   componentDidMount () {
     if(this.props.initState) {
       this.setState(this.props.initState)
+      this.eventsAction = 'IMPORT'
     }
     this.props.stateGetterCb(this.getState, this.props.id)
   }
@@ -98,6 +100,7 @@ class App extends Component {
     } else if (field_id === 4) { // reduction
       events_clone[index].pay_reduction = synthEvent.target.value
     } else if (field_id === 5) { // remove event
+      this.eventsAction = 'REMOVE'
       events_clone.splice(index, 1)
     } else if (field_id === 6) { // new payment method
       events_clone[index].payment_method = synthEvent.target.value
@@ -109,8 +112,10 @@ class App extends Component {
 
   handleButtons (param, synthEvent) {
     if (param === 1) {
+      this.eventsAction = 'ADD'
       this.addEvent()
     } else if (param === 2) {
+      this.eventsAction = 'IMPORT'
       if (synthEvent.value === 1) {
         this.clearAll(funcImportBasic)
       } else if (synthEvent.value === 2) {
@@ -127,6 +132,7 @@ class App extends Component {
     } else if (param === 6) {
       this.setState({showSummary: !this.state.showSummary});
     } else if (param === 7) {
+      this.eventsAction = 'IMPORT'
       this.handleFileImport(synthEvent)
     }
   }
@@ -324,7 +330,7 @@ class App extends Component {
         <div className='calc_container'>
           <Form callback={this.handleInput} values={this.state} />
           <Buttons callback={this.handleButtons} summary={this.state.showSummary} id={this.props.id} internal={this.state.showRawIO} />
-          <Events values={this.state.events} callback={this.handleEvents} />
+          <Events values={this.state.events} callback={this.handleEvents} eventsAction={this.eventsAction} />
           <ErrorMsg value={this.error} />
           <RawIO error={this.error} init={this.input_data} events={this.events_array} rval={this.rval_obj} payments={this.payments_array} visible={this.state.showRawIO} />
           <Summary values={this.rval_obj} error={this.error} visible={this.state.showSummary} />

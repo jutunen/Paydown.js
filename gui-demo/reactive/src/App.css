@@ -57,6 +57,28 @@ div.event_inclusion_container{
   width: 720px;
 }
 
+.event-transition-enter {
+  opacity: 0.01;
+  transform: scale(0);
+}
+
+.event-transition-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: all 200ms;
+}
+
+.event-transition-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.event-transition-exit-active {
+  opacity: 0.01;
+  transform: scale(0);
+  transition: all 200ms;
+}
+
 div.event_exclusion_container{
   display:flex;
   flex-direction: row;
@@ -70,6 +92,7 @@ div.event_container{
   flex-direction: row;
   justify-content: space-around;
   width: 840px;
+  height: 72px;
   background-color: #f2f2f2;
   padding: 3px 0px;
   margin-left: 20px;
@@ -271,12 +294,16 @@ div#checkboxes{
   flex-direction: column;
 }
 
-div.init_data{
+div.init_data, div.showhide_checkbox_container{
   display: flex;
   align-items: center;
   padding: 2px 10px;
   background-color: white;
   margin:5px;
+}
+
+div.showhide_checkbox_container:hover {
+  text-decoration: underline;
 }
 
 div.output_value{

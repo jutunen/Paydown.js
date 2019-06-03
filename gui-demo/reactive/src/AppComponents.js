@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
 import DatePicker from 'react-datepicker';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { saveAs } from 'file-saver';
 import * as cloneDeep from 'lodash.clonedeep';
 import './react-datepicker.css';
@@ -351,13 +352,13 @@ export function Buttons (props) {
       <ReactTooltip id='labelFileImport' effect='solid' html={true} delayShow={350} />
       <div id='checkboxes'>
         <label>
-          <div className='init_data'>
+          <div className='showhide_checkbox_container'>
             <input type='checkbox' checked={props.summary} onChange={() => props.callback(6)} />
             Show summary
           </div>
         </label>
         <label>
-          <div className='init_data'>
+          <div className='showhide_checkbox_container'>
             <input type='checkbox' checked={props.internal} onChange={() => props.callback(5)} />
             Show raw I/O
           </div>
@@ -448,15 +449,57 @@ class CalcEvent extends Component {
   }
 }
 
-export function Events (props) {
-  return (
-    <div className='events_container'>
-      {props.values.map( (value) => {
-        return <CalcEvent values={value} callback={props.callback} key={value.id} included={value.included} />
-        })
-      }
-    </div>
-  )
+export class Events extends Component {
+  constructor (props) {
+    super(props)
+    this.eventRef = React.createRef()
+  }
+
+  scrollToBottom = () => {
+    this.eventRef.current.scrollTop = this.eventRef.current.scrollHeight
+  };
+
+  disableResizing = () => {
+    this.eventRef.current.style.resize = 'none'
+    this.eventRef.current.style.overflow = 'visible'
+    this.eventRef.current.style.height = 'auto'
+  };
+
+  enableResizing = () => {
+    this.eventRef.current.style.resize = 'vertical'
+    this.eventRef.current.style.overflow = 'scroll'
+  };
+
+  componentDidUpdate() {
+    if(this.props.eventsAction === 'ADD') {
+      this.enableResizing()
+      this.scrollToBottom()
+    } else if (this.props.eventsAction === 'IMPORT') {
+      this.enableResizing()
+    }
+
+    if(this.props.values.length === 0) {
+      this.disableResizing()
+    }
+  }
+
+  render() {
+    return (
+      <div ref={this.eventRef} className='events_container'>
+        <TransitionGroup component={null}>
+          {this.props.values.map(
+            (value) => {
+              return (
+                       <CSSTransition classNames="event-transition" timeout={200} key={value.id}>
+                         <CalcEvent values={value} callback={this.props.callback} included={value.included} />
+                       </CSSTransition>
+                     )
+            })
+          }
+        </TransitionGroup>
+      </div>
+    )
+  }
 }
 
 export function RemoveButton (props) {
