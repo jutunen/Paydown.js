@@ -21,13 +21,15 @@ class App extends Component {
       recurringPaymentDay: 1,
       events: [],
       showSummary: true,
-      showRawIO: false
+      showRawIO: false,
+      tableTitle: ''
     }
 
     this.handleInput = this.handleInput.bind(this)
     this.handleEvents = this.handleEvents.bind(this)
     this.handleButtons = this.handleButtons.bind(this)
     this.getState = this.getState.bind(this)
+    this.handleTableTitle = this.handleTableTitle.bind(this)
 
     this.input_data = []
     this.payments_array = []
@@ -35,6 +37,7 @@ class App extends Component {
     this.rval_obj = {}
     this.error = ''
     this.eventsAction = ''
+    this.calculateInRender = true
 
     this.appRef = React.createRef()
   }
@@ -110,8 +113,14 @@ class App extends Component {
     this.setState({events: events_clone})
   }
 
+  handleTableTitle (synthEvent) {
+    this.calculateInRender = false
+    this.setState({tableTitle: synthEvent.target.value})
+  }
+
   handleButtons (param, synthEvent) {
     if (param === 1) {
+      this.calculateInRender = false
       this.eventsAction = 'ADD'
       this.addEvent()
     } else if (param === 2) {
@@ -164,10 +173,11 @@ class App extends Component {
         let stateFromFile = replace_XML_entities(match_array[3]);
         let stateAsObj = JSON.parse(stateFromFile)
         fixObjDates(stateAsObj)
+        fixObjTableTitle(stateAsObj)
         if(stateAsObj.events.length > 0) {
           fixObjEvent(stateAsObj)
         }
-        this.setState(stateAsObj, this.calculateInput)
+        this.setState(stateAsObj)
         }
       else
         {
@@ -229,6 +239,8 @@ class App extends Component {
       }
       if (this.state.events[i].date) {
         obj.date = date_obj_to_string(this.state.events[i].date)
+      } else {
+        continue
       }
       if (is_numeric(this.state.events[i].rate)) {
         obj.rate = Number(this.state.events[i].rate)
@@ -322,7 +334,11 @@ class App extends Component {
 
   render () {
 
-    this.calculateInput()
+    if( this.calculateInRender ) {
+      this.calculateInput()
+    } else {
+      this.calculateInRender = true
+    }
 
     return (
       <div ref={this.appRef} className='calc_container_container'>
@@ -334,7 +350,7 @@ class App extends Component {
           <ErrorMsg value={this.error} />
           <RawIO error={this.error} init={this.input_data} events={this.events_array} rval={this.rval_obj} payments={this.payments_array} visible={this.state.showRawIO} />
           <Summary values={this.rval_obj} error={this.error} visible={this.state.showSummary} />
-          <Table values={this.payments_array} error={this.error} sums={this.rval_obj} id={this.props.id} state={this.state} />
+          <Table values={this.payments_array} error={this.error} sums={this.rval_obj} id={this.props.id} state={this.state} callback={this.handleTableTitle} />
         </div>
       </div>
     )
@@ -450,6 +466,12 @@ function fixObjEvent(obj) {
       obj.events[i].included = true
     }
     obj.events[i].id = get_new_id()
+  }
+}
+
+function fixObjTableTitle(obj) {
+  if( !obj.hasOwnProperty('tableTitle') ) {
+    obj.tableTitle = ''
   }
 }
 

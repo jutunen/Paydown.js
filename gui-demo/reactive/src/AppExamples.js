@@ -10,6 +10,7 @@
     obj.paymentMethod ='equal_installment'
     obj.firstPaymentDate = new Date(2019,0,31)
     obj.recurringPaymentDay = 31
+    obj.tableTitle = 'Basic example'
     return obj
   }
 
@@ -24,6 +25,7 @@
     obj.paymentMethod ='equal_reduction'
     obj.firstPaymentDate = new Date(2019,0,31)
     obj.recurringPaymentDay = 31
+    obj.tableTitle = 'Advanced example'
     obj.events = []
 
     var event = {}
@@ -62,6 +64,7 @@ export function funcImportNoRecurringPayments (get_new_id) {
     obj.paymentMethod ='equal_reduction'
     obj.firstPaymentDate = null
     obj.recurringPaymentDay = 31
+    obj.tableTitle = 'No recurring payments example'
     obj.events = []
 
     var event = {}
@@ -100,6 +103,7 @@ export function funcImportInterestsOnlyPayments (get_new_id) {
     obj.paymentMethod ='equal_reduction'
     obj.firstPaymentDate = new Date(2019,0,31)
     obj.recurringPaymentDay = 31
+    obj.tableTitle = 'Interests only payments example'
     obj.events = []
 
     var event = {}

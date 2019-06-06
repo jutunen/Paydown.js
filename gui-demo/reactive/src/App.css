@@ -58,25 +58,23 @@ div.event_inclusion_container{
 }
 
 .event-transition-enter {
-  opacity: 0.01;
-  transform: scale(0);
+  max-height: 0;
 }
 
 .event-transition-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition: all 200ms;
+  max-height: 72px;
+  transition: max-height 200ms;
+  transition-timing-function: linear;
 }
 
 .event-transition-exit {
-  opacity: 1;
-  transform: scale(1);
+  max-height: 72px;
 }
 
 .event-transition-exit-active {
-  opacity: 0.01;
-  transform: scale(0);
-  transition: all 200ms;
+  max-height: 0;
+  transition: max-height 200ms;
+  transition-timing-function: linear;
 }
 
 div.event_exclusion_container{
@@ -99,6 +97,7 @@ div.event_container{
   margin-right: 20px;
   margin-top: 2px;
   border: 1px solid #f2f2f2;
+  overflow: hidden;
 }
 
 div.event_container:hover{
@@ -113,7 +112,7 @@ div.event_descriptor{
   display:flex;
   justify-content: center;
   align-items: center;
-  width: 100px;
+  width: 110px;
   height: 40px;
   text-align:center;
 }
@@ -216,8 +215,21 @@ img#app_remove_button {
   z-index: 1;
 }
 
+input.table_title_input{
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  border-color: transparent;
+  color: black;
+}
+
 div.table_container{
-  position:relative;
+  position: relative;
+}
+
+div.table_resize_container{
+  resize: vertical;
+  overflow: scroll;
 }
 
 div.table_saver{

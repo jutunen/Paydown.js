@@ -240,9 +240,26 @@ export function Table (props) {
     metadata = metadata_token + metadata
 
     var style = document.createElement('style');
-    style.innerHTML = '.bold_class{font-weight:bold;}table,th,td{border-spacing:0;text-align:center;font-family:Arial,Helvetica,sans-serif;border:1px solid black;}td{padding:1px 15px;min-width:100px;}'
+    style.innerHTML = '#tableTitleTd{text-align:left;}.bold_class{font-weight:bold;}table,th,td{border-spacing:0;text-align:center;font-family:Arial,Helvetica,sans-serif;border:1px solid black;}td{padding:1px 15px;min-width:100px;}'
 
-    var tableElement = document.getElementById(tableId)
+    var originalTableElement = document.getElementById(tableId)
+    var tableElement = originalTableElement.cloneNode(true)
+
+    var titleInputElement = tableElement.querySelector('#tableTitleInput')
+    if(titleInputElement) {
+      titleInputElement.remove()
+
+      var titleTdElement = tableElement.querySelector('#tableTitleTd')
+
+      if(titleTdElement) {
+        if(props.state.tableTitle === '') {
+          titleTdElement.remove()
+        } else {
+          titleTdElement.innerHTML = props.state.tableTitle
+        }
+      }
+    }
+
     tableElement.appendChild(style)
 
     var data_uri = '<!DOCTYPE html>' +
@@ -251,10 +268,11 @@ export function Table (props) {
                    '<meta charset=UTF-8">' +
                    "<meta name='paydown.js_gui' content='" + metadata + "'>" +
                    '<meta name="format-detection" content="telephone=no">' + // without this Edge might interpret number as telephone number and style it as link
-                   '<title>' + "Loan payments" + '</title>' +
+                   '<title>' + "Loan_payments" + '</title>' +
                    '</head>' +
                    '<body>' +
                    tableElement.outerHTML +
+                   '<div style="margin-top:3px;font-family:Arial,Helvetica,sans-serif;font-size:14px;"> Saving this table to file as HTML enables bringing table values back to calculator.</div>' +
                    '</body>' +
                    '</html>';
 
@@ -264,25 +282,34 @@ export function Table (props) {
 
   return (
     <div className='table_container'>
-      <table id={tableId}>
-        <tr className='bold_class'>
-          <td>Date</td>
-          <td>Rate</td>
-          <td>Installment</td>
-          <td>Reduction</td>
-          <td>Interest</td>
-          <td>Principal</td>
-        </tr>
-        {props.values.map(TableRow)}
-        <tr className='bold_class'>
-          <td>Total</td>
-          <td>-</td>
-          <td>{props.sums.sum_of_installments}</td>
-          <td>{props.sums.sum_of_reductions}</td>
-          <td>{props.sums.sum_of_interests}</td>
-          <td>-</td>
-        </tr>
-      </table>
+      <div className='table_resize_container'>
+        <table id={tableId}>
+          <tbody>
+            <tr>
+              <td id='tableTitleTd' colSpan='7'>
+                <input id='tableTitleInput' value={props.state.tableTitle} onChange={x => props.callback(x)} className='table_title_input' type='text' maxLength='200' placeholder='Insert table title or other information here!' />
+              </td>
+            </tr>
+            <tr className='bold_class'>
+              <td>Date</td>
+              <td>Rate</td>
+              <td>Installment</td>
+              <td>Reduction</td>
+              <td>Interest</td>
+              <td>Principal</td>
+            </tr>
+            {props.values.map(TableRow)}
+            <tr className='bold_class'>
+              <td>Total</td>
+              <td>-</td>
+              <td>{props.sums.sum_of_installments}</td>
+              <td>{props.sums.sum_of_reductions}</td>
+              <td>{props.sums.sum_of_interests}</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div data-tip={saveTableTooltipText} data-for='saveTable' className='table_saver' onClick={saveTableToFile}>
         Save table to file as HTML
       </div>
@@ -453,10 +480,15 @@ export class Events extends Component {
   constructor (props) {
     super(props)
     this.eventRef = React.createRef()
+    this.timeout = 200
   }
 
   scrollToBottom = () => {
     this.eventRef.current.scrollTop = this.eventRef.current.scrollHeight
+  };
+
+  scrollToBottomWrapper = () => {
+    setTimeout(this.scrollToBottom, this.timeout);
   };
 
   disableResizing = () => {
@@ -473,7 +505,7 @@ export class Events extends Component {
   componentDidUpdate() {
     if(this.props.eventsAction === 'ADD') {
       this.enableResizing()
-      this.scrollToBottom()
+      this.scrollToBottomWrapper()
     } else if (this.props.eventsAction === 'IMPORT') {
       this.enableResizing()
     }
@@ -490,7 +522,7 @@ export class Events extends Component {
           {this.props.values.map(
             (value) => {
               return (
-                       <CSSTransition classNames="event-transition" timeout={200} key={value.id}>
+                       <CSSTransition classNames="event-transition" timeout={this.timeout} key={value.id}>
                          <CalcEvent values={value} callback={this.props.callback} included={value.included} />
                        </CSSTransition>
                      )
