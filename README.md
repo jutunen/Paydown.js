@@ -26,7 +26,7 @@ See [examples](https://github.com/jutunen/Paydown.js/tree/master/examples#nodejs
 
 Both examples above are also available in the GUI demo, see http://paydowncalc.loan/
 
-Use the dropdown menu to import the examples to calculator.
+Click *Import example* button to get the menu.
 
 Demo source codes can be found from  [gui-demo/reactive](https://github.com/jutunen/Paydown.js/tree/master/gui-demo/reactive) directory.
 
