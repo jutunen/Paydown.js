@@ -208,11 +208,23 @@ p#duplicator_p{
   margin: 1px;
 }
 
-img#app_remove_button {
+input#app_remove_button {
   position: absolute;
   top: 5px;
   right: 10px;
   z-index: 1;
+}
+
+input#app_menu_button {
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  z-index: 1;
+}
+
+input#app_menu_button:hover {
+  transform:scale(1.1,1.1);
+  cursor:pointer;
 }
 
 input.table_title_input{

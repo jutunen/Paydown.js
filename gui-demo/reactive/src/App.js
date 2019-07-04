@@ -2,34 +2,21 @@ import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
 import './App.css';
 import Paydown from 'paydown'
-import { RawIO, Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, get_new_id, date_obj_to_string  } from './AppComponents.js'
-import * as cloneDeep from 'lodash.clonedeep';
-import { funcImportBasic, funcImportAdvanced, funcImportNoRecurringPayments, funcImportInterestsOnlyPayments } from './AppExamples.js'
+import { RawIO, Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, HamburgerMenu, get_new_id, date_obj_to_string  } from './AppComponents.js'
+import { connect } from 'react-redux';
+import { setStartDate, setEndDate, setRate, setPrincipal, setDayCountMethod, setRecurringPayment, setPaymentMethod, setFirstRecurringPaymentDate, setRecurringPaymentDay, clearAll, addEvent, deleteEvent, setEventDate, setEventRate, setEventReduction, setEventInstallment, setEventRecurringAmount, setEventPaymentMethod, importExample1, importExample2, importExample3, importExample4, toggleEventInclude, importFromFile, setTableTitle, toggleSummary, toggleRawIO, sortEventsByDate } from './actions.js';
+import { ActionCreators } from 'redux-undo';
 
 class App extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      startDate: null,
-      endDate: null,
-      principal: '',
-      rate: '',
-      dayCountMethod: 'act/360',
-      recurringPayment: '',
-      paymentMethod: 'equal_installment',
-      firstPaymentDate: null,
-      recurringPaymentDay: 1,
-      events: [],
-      showSummary: true,
-      showRawIO: false,
-      tableTitle: ''
-    }
 
     this.handleInput = this.handleInput.bind(this)
     this.handleEvents = this.handleEvents.bind(this)
     this.handleButtons = this.handleButtons.bind(this)
     this.getState = this.getState.bind(this)
     this.handleTableTitle = this.handleTableTitle.bind(this)
+    this.handleMenu = this.handleMenu.bind(this)
 
     this.input_data = []
     this.payments_array = []
@@ -40,14 +27,14 @@ class App extends Component {
     this.calculateInRender = true
 
     this.appRef = React.createRef()
+    this.eventsRef = React.createRef()
   }
 
   componentDidMount () {
-    if(this.props.initState) {
-      this.setState(this.props.initState)
-      this.eventsAction = 'IMPORT'
-    }
     this.props.stateGetterCb(this.getState, this.props.id)
+    this.props.dispatch(ActionCreators.clearHistory())
+    // this is just to get redux undo state correct:
+    this.forceUpdate()
   }
 
   componentWillUnmount() {
@@ -55,67 +42,39 @@ class App extends Component {
   }
 
   getState () {
-    return this.state;
+    return this.props.store.getState()
   }
 
-  addEvent (obj_ref) {
-    var event
-    if (obj_ref) {
-      event = {
-        date: obj_ref.date,
-        rate: obj_ref.rate,
-        recurring_amount: obj_ref.recurring_amount,
-        pay_installment: obj_ref.pay_installment,
-        pay_reduction: obj_ref.pay_reduction,
-        payment_method: '',
-        id: get_new_id(),
-        included: true
-      }
-    } else {
-      event = {
-        date: '',
-        rate: '',
-        recurring_amount: '',
-        pay_installment: '',
-        pay_reduction: '',
-        payment_method: '',
-        id: get_new_id(),
-        included: true
-      }
-    }
-    var events = [...this.state.events]
-    events.push(event)
-    this.setState({events: events})
+  addEvent () {
+    this.props.dispatch(addEvent(get_new_id()))
   }
 
   handleEvents (synthEvent, event_id, field_id) {
-    var events_clone = [...this.state.events]
-    var index = events_clone.findIndex(x => findEventById(x, event_id))
 
     if (field_id === 0) { // date
-      events_clone[index].date = synthEvent
+      this.props.dispatch(setEventDate(event_id, synthEvent))
     } else if (field_id === 1) { // rate
-      events_clone[index].rate = synthEvent.target.value
+      this.props.dispatch(setEventRate(event_id, synthEvent.target.value))
     } else if (field_id === 2) { // amount
-      events_clone[index].recurring_amount = synthEvent.target.value
+      this.props.dispatch(setEventRecurringAmount(event_id, synthEvent.target.value))
     } else if (field_id === 3) { // installment
-      events_clone[index].pay_installment = synthEvent.target.value
+      this.props.dispatch(setEventInstallment(event_id, synthEvent.target.value))
     } else if (field_id === 4) { // reduction
-      events_clone[index].pay_reduction = synthEvent.target.value
+      this.props.dispatch(setEventReduction(event_id, synthEvent.target.value))
     } else if (field_id === 5) { // remove event
       this.eventsAction = 'REMOVE'
-      events_clone.splice(index, 1)
+      this.props.dispatch(deleteEvent(event_id))
     } else if (field_id === 6) { // new payment method
-      events_clone[index].payment_method = synthEvent.target.value
+      this.props.dispatch(setEventPaymentMethod(event_id, synthEvent.target.value))
     } else if (field_id === 7) { // included
-      events_clone[index].included = !events_clone[index].included
+      this.props.dispatch(toggleEventInclude(event_id))
     }
-    this.setState({events: events_clone})
+
   }
 
   handleTableTitle (synthEvent) {
     this.calculateInRender = false
-    this.setState({tableTitle: synthEvent.target.value})
+    this.props.dispatch(setTableTitle(synthEvent.target.value))
   }
 
   handleButtons (param, synthEvent) {
@@ -125,24 +84,44 @@ class App extends Component {
       this.addEvent()
     } else if (param === 2) {
       this.eventsAction = 'IMPORT'
-      if (synthEvent.value === 1) {
-        this.clearAll(funcImportBasic)
-      } else if (synthEvent.value === 2) {
-        this.clearAll(funcImportAdvanced(get_new_id))
-      } else if(synthEvent.value === 3) {
-        this.clearAll(funcImportNoRecurringPayments(get_new_id))
-      } else if(synthEvent.value === 4) {
-        this.clearAll(funcImportInterestsOnlyPayments(get_new_id))
+      if (synthEvent === 1) {
+        this.props.dispatch(importExample1())
+      } else if (synthEvent === 2) {
+        this.props.dispatch(importExample2())
+      } else if(synthEvent === 3) {
+        this.props.dispatch(importExample3())
+      } else if(synthEvent === 4) {
+        this.props.dispatch(importExample4())
       }
     } else if (param === 4) {
       this.clearAll()
     } else if (param === 5) {
-      this.setState({showRawIO: !this.state.showRawIO});
+      this.props.dispatch(toggleRawIO())
     } else if (param === 6) {
-      this.setState({showSummary: !this.state.showSummary});
+      this.props.dispatch(toggleSummary())
     } else if (param === 7) {
       this.eventsAction = 'IMPORT'
       this.handleFileImport(synthEvent)
+    }
+  }
+
+  handleMenu (param) {
+    if(param === 1) {
+      // undo
+      this.props.dispatch(ActionCreators.undo())
+    } else if(param === 2) {
+      // redo
+      this.props.dispatch(ActionCreators.redo())
+    } else if(param === 3) {
+      // sort events by date
+      this.props.dispatch(sortEventsByDate())
+    } else if(param === 4) {
+      // shrink events
+      this.eventsRef.current.shrinkHeight()
+    } else if(param === 5) {
+      // expand events
+      this.eventsRef.current.disableResizing()
+      this.eventsRef.current.enableResizing()
     }
   }
 
@@ -177,7 +156,7 @@ class App extends Component {
         if(stateAsObj.events.length > 0) {
           fixObjEvent(stateAsObj)
         }
-        this.setState(stateAsObj)
+        this.props.dispatch(importFromFile(stateAsObj))
         }
       else
         {
@@ -189,40 +168,28 @@ class App extends Component {
   }
 
   clearAll (func) {
-    this.setState({startDate: ''})
-    this.setState({endDate: ''})
-    this.setState({principal: ''})
-    this.setState({rate: ''})
-    this.setState({recurringPayment: ''})
-    this.setState({firstPaymentDate: ''})
-    this.setState({events: []})
-    this.setError('')
-    this.input_data = {}
-    this.events_array = []
-    this.rval_obj = {}
-    this.payments_array = []
-    this.clearOutput(func)
+    this.props.dispatch(clearAll())
   }
 
   handleInput (event, id) {
     if (id === 0) {
-      this.setState({startDate: event})
+      this.props.dispatch(setStartDate(event))
     } else if (id === 1) {
-      this.setState({endDate: event})
+      this.props.dispatch(setEndDate(event))
     } else if (id === 2) {
-      this.setState({principal: event.target.value})
+      this.props.dispatch(setPrincipal(event.target.value))
     } else if (id === 3) {
-      this.setState({rate: event.target.value})
+      this.props.dispatch(setRate(event.target.value))
     } else if (id === 4) {
-      this.setState({dayCountMethod: event.target.value})
+      this.props.dispatch(setDayCountMethod(event.target.value))
     } else if (id === 5) {
-      this.setState({recurringPayment: event.target.value})
+      this.props.dispatch(setRecurringPayment(event.target.value))
     } else if (id === 6) {
-      this.setState({paymentMethod: event.target.value})
+      this.props.dispatch(setPaymentMethod(event.target.value))
     } else if (id === 7) {
-      this.setState({firstPaymentDate: event})
+      this.props.dispatch(setFirstRecurringPaymentDate(event))
     } else if (id === 8) {
-      this.setState({recurringPaymentDay: event.target.value})
+      this.props.dispatch(setRecurringPaymentDay(event.target.value))
     }
     ReactTooltip.hide()
   }
@@ -231,31 +198,31 @@ class App extends Component {
   copyEvents (array_ref) {
     var i = 0
     var obj = {}
-    for (i = 0; i < this.state.events.length; i++) {
-      if( this.state.events[i].hasOwnProperty('included') ) {
-        if (this.state.events[i].included === false) {
+    for (i = 0; i < this.props.events.length; i++) {
+      if( this.props.events[i].hasOwnProperty('included') ) {
+        if (this.props.events[i].included === false) {
           continue
         }
       }
-      if (this.state.events[i].date) {
-        obj.date = date_obj_to_string(this.state.events[i].date)
+      if (this.props.events[i].date) {
+        obj.date = date_obj_to_string(this.props.events[i].date)
       } else {
         continue
       }
-      if (is_numeric(this.state.events[i].rate)) {
-        obj.rate = Number(this.state.events[i].rate)
+      if (is_numeric(this.props.events[i].rate)) {
+        obj.rate = Number(this.props.events[i].rate)
       }
-      if (is_numeric(this.state.events[i].recurring_amount)) {
-        obj.recurring_amount = Number(this.state.events[i].recurring_amount)
+      if (is_numeric(this.props.events[i].recurring_amount)) {
+        obj.recurring_amount = Number(this.props.events[i].recurring_amount)
       }
-      if (is_numeric(this.state.events[i].pay_installment)) {
-        obj.pay_installment = Number(this.state.events[i].pay_installment)
+      if (is_numeric(this.props.events[i].pay_installment)) {
+        obj.pay_installment = Number(this.props.events[i].pay_installment)
       }
-      if (is_numeric(this.state.events[i].pay_reduction)) {
-        obj.pay_reduction = Number(this.state.events[i].pay_reduction)
+      if (is_numeric(this.props.events[i].pay_reduction)) {
+        obj.pay_reduction = Number(this.props.events[i].pay_reduction)
       }
-      if (this.state.events[i].payment_method) {
-        obj.payment_method = this.state.events[i].payment_method
+      if (this.props.events[i].payment_method) {
+        obj.payment_method = this.props.events[i].payment_method
       }
       array_ref.push(Object.assign({}, obj))
       obj = {}
@@ -266,33 +233,33 @@ class App extends Component {
     this.input_data = {}
     this.input_data.recurring = {}
 
-    if(this.state.startDate instanceof Date) {
-      this.input_data.start_date = date_obj_to_string(this.state.startDate)
+    if(this.props.startDate instanceof Date) {
+      this.input_data.start_date = date_obj_to_string(this.props.startDate)
     } else {
       this.setError(":Invalid start date!")
       return
     }
 
-    if(this.state.endDate instanceof Date) {
-      this.input_data.end_date =  date_obj_to_string(this.state.endDate)
+    if(this.props.endDate instanceof Date) {
+      this.input_data.end_date =  date_obj_to_string(this.props.endDate)
     } else {
       this.setError(":Invalid end date!")
       return
     }
 
-    this.input_data.principal = Number(this.state.principal)
-    this.input_data.rate = Number(this.state.rate)
-    this.input_data.day_count_method = this.state.dayCountMethod
+    this.input_data.principal = Number(this.props.principal)
+    this.input_data.rate = Number(this.props.rate)
+    this.input_data.day_count_method = this.props.dayCountMethod
 
-    this.input_data.recurring.payment_method = this.state.paymentMethod
-    if(this.state.firstPaymentDate instanceof Date) {
-      this.input_data.recurring.first_payment_date = date_obj_to_string(this.state.firstPaymentDate)
+    this.input_data.recurring.payment_method = this.props.paymentMethod
+    if(this.props.firstPaymentDate instanceof Date) {
+      this.input_data.recurring.first_payment_date = date_obj_to_string(this.props.firstPaymentDate)
     } else {
       this.input_data.recurring.first_payment_date = '';
     }
-    this.input_data.recurring.payment_day = Number(this.state.recurringPaymentDay)
-    if(is_numeric(this.state.recurringPayment)) {
-      this.input_data.recurring.amount = Number(this.state.recurringPayment)
+    this.input_data.recurring.payment_day = Number(this.props.recurringPaymentDay)
+    if(is_numeric(this.props.recurringPayment)) {
+      this.input_data.recurring.amount = Number(this.props.recurringPayment)
     } else {
       delete this.input_data.recurring
     }
@@ -341,100 +308,21 @@ class App extends Component {
     }
 
     return (
-      <div ref={this.appRef} className='calc_container_container'>
-        <RemoveButton id={this.props.id} visible={this.props.removable} callback={this.props.removerCb} highlightCallback={this.calcHighlighter} />
-        <div className='calc_container'>
-          <Form callback={this.handleInput} values={this.state} />
-          <Buttons callback={this.handleButtons} summary={this.state.showSummary} id={this.props.id} internal={this.state.showRawIO} />
-          <Events values={this.state.events} callback={this.handleEvents} eventsAction={this.eventsAction} />
-          <ErrorMsg value={this.error} />
-          <RawIO error={this.error} init={this.input_data} events={this.events_array} rval={this.rval_obj} payments={this.payments_array} visible={this.state.showRawIO} />
-          <Summary values={this.rval_obj} error={this.error} visible={this.state.showSummary} />
-          <Table values={this.payments_array} error={this.error} sums={this.rval_obj} id={this.props.id} state={this.state} callback={this.handleTableTitle} />
+        <div ref={this.appRef} className='calc_container_container'>
+          <HamburgerMenu callback={this.handleMenu} store={this.props.store} />
+          <RemoveButton id={this.props.id} visible={this.props.removable} callback={this.props.removerCb} highlightCallback={this.calcHighlighter} />
+          <div className='calc_container'>
+            <Form callback={this.handleInput} values={this.props} />
+            <Buttons callback={this.handleButtons} id={this.props.id} summary={this.props.showSummary} internal={this.props.showRawIO} />
+            <Events ref={this.eventsRef} values={this.props.events} callback={this.handleEvents} eventsAction={this.eventsAction} />
+            <ErrorMsg value={this.error} />
+            <RawIO error={this.error} init={this.input_data} events={this.events_array} rval={this.rval_obj} payments={this.payments_array} visible={this.props.showRawIO} />
+            <Summary values={this.rval_obj} error={this.error} visible={this.props.showSummary} />
+            <Table values={this.payments_array} error={this.error} sums={this.rval_obj} id={this.props.id} state={this.props} callback={this.handleTableTitle} />
+          </div>
         </div>
-      </div>
     )
   }
-}
-
-function Apps (props) {
-  return (
-    <>
-      {props.ids.map( (value) => {
-        return <App key={value} id={value} removable={props.ids.length > 1 ? true : false} removerCb={props.removerCb} stateGetterCb={props.stateGetterCb} initState={props.initState} />
-        })
-      }
-    </>
-  )
-}
-
-function Duplicator (props) {
-
-  if(props.visible !== true) {
-    return null
-  }
-  return (
-    <div id='duplicator'>
-      <p id='duplicator_p'>One calculator isn't enough?</p>
-      <button onClick={props.callback} id='duplicate_button'>Make it double!</button>
-    </div>
-  )
-}
-
-class AppContainer extends Component {
-  constructor (props) {
-    super(props)
-    this.state = { appIds: [0] }
-    this.newAppId = 1
-    this.duplicateApp = this.duplicateApp.bind(this)
-    this.removeApp = this.removeApp.bind(this)
-    this.getStateGetterFunction = this.getStateGetterFunction.bind(this)
-    this.copyOfState = null
-    this.stateGetters = []
-
-    window.g_event_id_counter = 0
-  }
-
-  getStateGetterFunction(stateGetter, id) {
-    if(stateGetter !== null) {
-      this.stateGetters.push({func:stateGetter, id:id})
-    } else {
-      let indexToBeRemoved = this.stateGetters.findIndex(x => { if(x.id === id) {return true}; return false }  )
-      this.stateGetters.splice(indexToBeRemoved, 1)
-    }
-  }
-
-  duplicateApp () {
-    this.copyOfState = cloneDeep(this.stateGetters[0].func())
-    var newIds = [...this.state.appIds]
-    newIds.push(this.newAppId++)
-    this.setState({ appIds: newIds })
-  }
-
-  removeApp (synthEvent, id) {
-    var newIds = [...this.state.appIds]
-    var index = newIds.indexOf(id)
-    newIds.splice(index, 1)
-    this.setState({ appIds: newIds })
-  }
-
-  render () {
-    return (
-      <>
-      <div id='app_container'>
-        <Apps ids={this.state.appIds} removerCb={this.removeApp} stateGetterCb={this.getStateGetterFunction} initState={this.copyOfState}/>
-      </div>
-      <Duplicator callback={this.duplicateApp} visible={this.state.appIds.length > 1 ? false : true} />
-      </>
-    )
-  }
-}
-
-function findEventById (x, event_id) {
-  if (x.id == event_id) {
-    return true
-  }
-  return false
 }
 
 function is_numeric (n) {
@@ -484,4 +372,8 @@ function stringToDate( str ) {
   return dateObj
 }
 
-export default AppContainer;
+function mapStateToProps(state) {
+  return Object.assign( {}, state.present )
+}
+
+export default connect(mapStateToProps)(App);

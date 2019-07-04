@@ -1,14 +1,14 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import ReactTooltip from 'react-tooltip';
 import DatePicker from 'react-datepicker';
+import Downshift from 'downshift';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { saveAs } from 'file-saver';
 import * as cloneDeep from 'lodash.clonedeep';
 import './react-datepicker.css';
 import './App.css';
 import delButton from './delete-button.png';
-import Dropdown from './react-dropdown.js' // <--- Note that this is a local file, not an NPM package!!!
-import './react-dropdown-style.css'
+import menuButton from './hamburger-icon.png';
 
 export function Form (props) {
   return (
@@ -207,8 +207,18 @@ export function Table (props) {
     return null
   }
 
+  var handleKeyPress = (event) => {
+    if(event.key === 'Enter'){
+      saveTableToFile()
+    }
+  }
+
   var saveTableToFile = () => {
     var stateCopy = cloneDeep(props.state)
+
+    delete stateCopy.id
+    delete stateCopy.removable
+    delete stateCopy.store
 
     if(stateCopy.startDate instanceof Date) {
       stateCopy.startDate = date_obj_to_string(stateCopy.startDate)
@@ -268,7 +278,7 @@ export function Table (props) {
                    '<meta charset=UTF-8">' +
                    "<meta name='paydown.js_gui' content='" + metadata + "'>" +
                    '<meta name="format-detection" content="telephone=no">' + // without this Edge might interpret number as telephone number and style it as link
-                   '<title>' + "Loan_payments" + '</title>' +
+                   '<title>Loan_payments</title>' +
                    '</head>' +
                    '<body>' +
                    tableElement.outerHTML +
@@ -310,7 +320,7 @@ export function Table (props) {
           </tbody>
         </table>
       </div>
-      <div data-tip={saveTableTooltipText} data-for='saveTable' className='table_saver' onClick={saveTableToFile}>
+      <div tabIndex='0' data-tip={saveTableTooltipText} data-for='saveTable' className='table_saver' onClick={saveTableToFile} onKeyPress={handleKeyPress}>
         Save table to file as HTML
       </div>
       <ReactTooltip id='saveTable' effect='solid' html={true} delayShow={350} />
@@ -358,20 +368,73 @@ export function RawIO (props) {
   )
 }
 
+function DownShiftSelect(props) {
+
+  const items = [
+    { value: 'Basic', tip: 'Example without events', id: 1 },
+    { value: 'Advanced', tip: 'Example with 2 events', id: 2 },
+    { value: 'No recurring payments', tip: 'Both payments in this<br />example are defined by events', id: 3 },
+    { value: 'Interests only payments', tip: 'Setting recurring amount to<br />zero enables interests only payments', id: 4 }
+  ]
+
+  return (
+    <Downshift
+      onSelect={selection => props.callback(2, selection.id)}
+      itemToString={item => (item ? item.value : '')}
+    >
+      {({
+        getInputProps,
+        getItemProps,
+        getLabelProps,
+        getMenuProps,
+        isOpen,
+        inputValue,
+        highlightedIndex,
+        selectedItem,
+        getToggleButtonProps
+      }) => (
+        <div>
+          <button {...getToggleButtonProps()} >Import example</button>
+          <ul {...getMenuProps()} style={{listStyleType:'none',position:'absolute',top:'40px',left:'125px',zIndex:'1'}}>
+            {isOpen
+              ? items
+                  .map((item, index) => (
+                    <React.Fragment key={item.id}>
+                    <li
+                      {...getItemProps({
+                        key: item.value,
+                        index,
+                        item,
+                        style: {
+                          backgroundColor: highlightedIndex === index ? '#f2f9fc' : 'white',
+                          textDecoration: highlightedIndex === index ? 'underline' : 'none',
+                          padding:'10px',
+                          cursor: 'pointer'
+                        }
+                      })}
+                      data-tip={item.tip} data-for='importExampleItem'
+                    >
+                      {item.value}
+                    </li>
+                    <ReactTooltip id='importExampleItem' effect='solid' place='right' html={true} delayShow={350} />
+                    </React.Fragment>
+                  ))
+              : null}
+          </ul>
+        </div>
+      )}
+    </Downshift>
+  )
+}
+
+
 export function Buttons (props) {
   var fileImportTooltipText = 'When a payments table is saved to file as HTML, the<br />table input values can be imported back to this calculator.'
-  const dropdownOptions = [
-    { value: 1, label: 'Basic', tip: 'Example without events' },
-    { value: 2, label: 'Advanced', tip: 'Example with 2 events' },
-    { value: 3, label: 'No recurring payments', tip: 'Both payments in this<br />example are defined by events' },
-    { value: 4, label: 'Interests only payments', tip: 'Setting recurring amount to<br />zero enables interests only payments' }
-  ]
 
   return (
     <div id='buttons_container'>
       <button name="addEvent" onClick={() => props.callback(1)} type='button'>Add event</button>
-      <Dropdown options={dropdownOptions} onChange={(x) => props.callback(2, x)} placeholder="Import an example" />
-      {/*<button onClick={() => props.callback(5)} type='button'>Show inside I/O</button>*/}
+      <DownShiftSelect callback={props.callback} />
       <input className='fileImport' id={'fileImport_' + props.id} type='file' accept='.html,.htm,.pdf' onChange={ x => props.callback(7, x) }></input>
       <label data-tip={fileImportTooltipText} data-for='labelFileImport' className='fileImportLabel' htmlFor={'fileImport_' + props.id}>
         Import from file
@@ -469,18 +532,22 @@ class CalcEvent extends Component {
           </div>
         </div>
         <div className='event_data'>
-          <img name="eventRemove" src={delButton} alt='Remove' height='25' width='25' onClick={x => this.props.callback(x, this.props.values.id, 5)} onMouseEnter={this.highLightEvent} onMouseLeave={this.unhighLightEvent} />
+          <input type='image' name="eventRemove" src={delButton} alt='Remove' height='25' width='25' onClick={x => this.props.callback(x, this.props.values.id, 5)} onMouseEnter={this.highLightEvent} onMouseLeave={this.unhighLightEvent} />
         </div>
       </div>
     )
   }
 }
 
-export class Events extends Component {
+export class Events extends PureComponent {
   constructor (props) {
     super(props)
     this.eventRef = React.createRef()
     this.timeout = 200
+  }
+
+  shrinkHeight = () => {
+    this.eventRef.current.style.height = '15px'
   }
 
   scrollToBottom = () => {
@@ -497,9 +564,17 @@ export class Events extends Component {
     this.eventRef.current.style.height = 'auto'
   };
 
-  enableResizing = () => {
+  enableResizing = (autoHeight) => {
     this.eventRef.current.style.resize = 'vertical'
     this.eventRef.current.style.overflow = 'scroll'
+    if(autoHeight) {
+      this.eventRef.current.style.height = 'auto'
+    } else {
+      let height = parseInt(this.eventRef.current.style.height)
+      if(height < 20) {
+        this.eventRef.current.style.height = '105px'
+      }
+    }
   };
 
   componentDidUpdate() {
@@ -507,7 +582,7 @@ export class Events extends Component {
       this.enableResizing()
       this.scrollToBottomWrapper()
     } else if (this.props.eventsAction === 'IMPORT') {
-      this.enableResizing()
+      this.enableResizing(true)
     }
 
     if(this.props.values.length === 0) {
@@ -515,7 +590,18 @@ export class Events extends Component {
     }
   }
 
+  componentDidMount() {
+    if(this.props.values.length > 0) {
+      this.enableResizing()
+    }
+  }
+
   render() {
+
+    if(!this.props.values) {
+      return null
+    }
+
     return (
       <div ref={this.eventRef} className='events_container'>
         <TransitionGroup component={null}>
@@ -541,11 +627,101 @@ export function RemoveButton (props) {
 
   return (
     <>
-    <img data-tip data-for='removeButton' src={delButton} id="app_remove_button" alt='Remove' height='35' width='35' onClick={x => props.callback(x, props.id)} onMouseEnter={x => props.highlightCallback(x,true)} onMouseLeave={x => props.highlightCallback(x,false)} />
+    <input type='image' data-tip data-for='removeButton' src={delButton} id="app_remove_button" alt='Remove' height='35' width='35' onClick={x => props.callback(x, props.id)} onMouseEnter={x => props.highlightCallback(x,true)} onMouseLeave={x => props.highlightCallback(x,false)} />
     <ReactTooltip id='removeButton' effect='solid' delayShow={350}>
       <span>Remove this side calculator</span>
     </ReactTooltip>
     </>
+  )
+}
+
+// this is just to keep the menu open on undo/redo clicks:
+function stateReducer(state, changes)
+{
+  if( ( changes.inputValue === 'Undo' || changes.inputValue === 'Redo' ) && ( changes.type === "__autocomplete_click_item__" || changes.type === "__autocomplete_keydown_enter__" ) ) {
+    return {
+      ...changes,
+      isOpen: true
+    }
+  }
+
+  return changes
+}
+
+export function HamburgerMenu (props) {
+  const items = [
+    { value: 'Undo', tip: 'Undo last action', id: 1, clickable: true },
+    { value: 'Redo', tip: 'Redo last action', id: 2, clickable: true },
+    { value: 'Arrange events by date', tip: 'Arrange events by date', id: 3, clickable: true },
+    { value: 'Shrink events', tip: 'Shrink events view', id: 4, clickable: true },
+    { value: 'Expand events', tip: 'Expand events view', id: 5, clickable: true }
+  ]
+
+  var state
+  if(props.store) {
+    state = props.store.getState()
+    if(state.past.length === 0) {
+      // set Undo to unclickable
+      items[0].clickable = false
+    }
+    if(state.future.length === 0) {
+      // set Redo to unclickable
+      items[1].clickable = false
+    }
+  }
+
+  return (
+    <Downshift
+      onSelect={selection => props.callback(selection ? selection.id : null)}
+      itemToString={item => (item ? item.value : '')}
+      stateReducer={stateReducer}
+    >
+      {({
+        getInputProps,
+        getItemProps,
+        getLabelProps,
+        getMenuProps,
+        isOpen,
+        inputValue,
+        highlightedIndex,
+        selectedItem,
+        getToggleButtonProps
+      }) => (
+        <div>
+          <input {...getToggleButtonProps()} type='image' data-tip data-for='menuButton' src={menuButton} id="app_menu_button" alt='Menu' height='35' width='35' />
+          <ReactTooltip id='menuButton' effect='solid' place='right' delayShow={350}>
+            <span>Show menu</span>
+          </ReactTooltip>
+          <ul {...getMenuProps()} style={{listStyleType:'none',position:'absolute',top:'25px',left:'-30px',zIndex:'1'}}>
+            {isOpen
+              ? items
+                  .map((item, index) => (
+                    <React.Fragment key={item.id}>
+                    <li
+                      {...getItemProps({
+                        key: item.value,
+                        index,
+                        item,
+                        style: {
+                          backgroundColor: highlightedIndex === index ? '#f2f9fc' : 'white',
+                          textDecoration: highlightedIndex === index && item.clickable ? 'underline' : 'none',
+                          padding:'10px',
+                          cursor: item.clickable ? 'pointer' : 'initial',
+                          color: item.clickable ? 'black' : 'gray'
+                        }
+                      })}
+                      data-tip={item.tip} data-for='importExampleItem'
+                    >
+                      {item.value}
+                    </li>
+                    <ReactTooltip id='importExampleItem' effect='solid' place='right' html={true} delayShow={350} />
+                    </React.Fragment>
+                  ))
+              : null}
+          </ul>
+        </div>
+      )}
+    </Downshift>
   )
 }
 

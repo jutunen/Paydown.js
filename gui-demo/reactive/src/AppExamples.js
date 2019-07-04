@@ -11,6 +11,9 @@
     obj.firstPaymentDate = new Date(2019,0,31)
     obj.recurringPaymentDay = 31
     obj.tableTitle = 'Basic example'
+    obj.showSummary = false
+    obj.showRawIO = false
+    obj.events = []
     return obj
   }
 
@@ -26,6 +29,8 @@
     obj.firstPaymentDate = new Date(2019,0,31)
     obj.recurringPaymentDay = 31
     obj.tableTitle = 'Advanced example'
+    obj.showSummary = false
+    obj.showRawIO = false
     obj.events = []
 
     var event = {}
@@ -65,6 +70,8 @@ export function funcImportNoRecurringPayments (get_new_id) {
     obj.firstPaymentDate = null
     obj.recurringPaymentDay = 31
     obj.tableTitle = 'No recurring payments example'
+    obj.showSummary = false
+    obj.showRawIO = false
     obj.events = []
 
     var event = {}
@@ -104,6 +111,8 @@ export function funcImportInterestsOnlyPayments (get_new_id) {
     obj.firstPaymentDate = new Date(2019,0,31)
     obj.recurringPaymentDay = 31
     obj.tableTitle = 'Interests only payments example'
+    obj.showSummary = false
+    obj.showRawIO = false
     obj.events = []
 
     var event = {}
