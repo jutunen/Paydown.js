@@ -56,7 +56,7 @@ function _Paydown () {
   this.latest_calculated_interest_date = ''
   this.latest_payment_date = ''
   this.current_rate = ''
-  this.current_recurring_payment = ''
+  this.current_recurring_payment = null // null indicates that recurring data is missing or invalid
   this.current_principal = ''
   this.g_p_i_sum_of_interests = 0
   this.total_number_of_days = 0
@@ -400,7 +400,7 @@ function _Paydown () {
     this.check_date(this.init.start_date, "start")
     this.check_date(this.init.end_date, "end")
 
-    if (this.init.amount !== null) {  // init.amount turha? käytä suoraan this.current_recurring_payment?
+    if (this.current_recurring_payment !== null) {   // null indicates that recurring data is missing or invalid
       this.check_first_payment_date()
       this.generate_payment_events_till(this.init.end_date)
     }
@@ -436,7 +436,6 @@ function _Paydown () {
 
     this.current_principal = this.init.principal
     this.current_rate = this.init.rate
-    this.current_recurring_payment = this.init.amount // init.amount turha? käytä suoraan this.current_recurring_payment?
     this.sum_of_fees = this.initial_fee
 
     for (index = 0; index < this.event_array.length; index++) {
@@ -444,13 +443,13 @@ function _Paydown () {
       // this.mainLoopIterations++
       if (this.event_array[index].hasOwnProperty('recurring_amount')) {
         // recurring payment amount changes
-        if(this.init.amount === null) { throw new Error('Can\'t do recurring_amount: initial recurring data missing or invalid!') } // init.amount turha? käytä suoraan this.current_recurring_payment?
+        if(this.current_recurring_payment === null) { throw new Error('Can\'t do recurring_amount: initial recurring data missing or invalid!') } // turha? käytä suoraan?
         this.current_recurring_payment = this.event_array[index].recurring_amount
       }
 
       if (this.event_array[index].hasOwnProperty('recurring_payment_fee')) {
         // recurring payment amount changes
-        if(this.init.amount === null) { throw new Error('Can\'t do recurring_payment_fee: initial recurring data missing or invalid!') } // init.amount turha? käytä suoraan this.current_recurring_payment?
+        if(this.current_recurring_payment === null) { throw new Error('Can\'t do recurring_payment_fee: initial recurring data missing or invalid!') } // turha? käytä suoraan?
         this.current_recurring_fee = this.event_array[index].recurring_payment_fee
       }
 
@@ -472,7 +471,7 @@ function _Paydown () {
       }
 
       if (this.event_array[index].hasOwnProperty('pay_recurring')) {
-        if(this.init.amount === null) { throw new Error('Can\'t do pay_recurring: initial recurring data missing or invalid!') } // init.amount turha? käytä suoraan this.current_recurring_payment?
+        if(this.current_recurring_payment === null) { throw new Error('Can\'t do pay_recurring: initial recurring data missing or invalid!') } // turha? käytä suoraan?
         // recurring payment transaction occurs
         if (this.init.payment_method === 'equal_installment') {
           if (!this.func_pay_installment(index, date_obj, this.current_recurring_payment, this.current_recurring_fee)) {
@@ -598,7 +597,7 @@ function _Paydown () {
       if( !data.recurring.hasOwnProperty('amount') || !number_is_valid(data.recurring.amount) ) {
         throw new Error('this.set_init: invalid or missing recurring amount')
       }
-      this.init.amount = data.recurring.amount // init.amount turha? käytä suoraan this.current_recurring_payment?
+      this.current_recurring_payment = data.recurring.amount
 
       if( !data.recurring.hasOwnProperty('first_payment_date') ) {
         throw new Error('this.set_init: missing first recurring payment date')
@@ -622,7 +621,7 @@ function _Paydown () {
         this.current_recurring_fee = data.recurring.payment_fee
       }
     } else {
-      this.init.amount = null // init.amount turha? käytä suoraan this.current_recurring_payment?
+      this.current_recurring_payment = null  // null indicates that recurring data is missing or invalid
     }
 
     if (data.hasOwnProperty('round_values')) {
