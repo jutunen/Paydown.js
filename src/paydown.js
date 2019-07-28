@@ -18,10 +18,10 @@ function Paydown () {
       paydown.check_and_add_event(local_array.shift())
     }
 
-    var interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest
+    var interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest, fees
 
     try {
-      [interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest] = paydown.calculate_to_date(payments_array, debug_array)
+      [interests, reductions, remaining_principal, actual_end_date, latest_payment_date, final_interest, fees] = paydown.calculate_to_date(payments_array, debug_array)
     } catch (err) {
       throw (err)
     }
@@ -46,7 +46,8 @@ function Paydown () {
       days_calculated: paydown.total_number_of_days,
       actual_end_date: zero_fill_date(actual_end_date),
       latest_payment_date: zero_fill_date(latest_payment_date),
-      unpaid_interest: final_interest
+      unpaid_interest: final_interest,
+      sum_of_fees: fees
     }
   }
 }
@@ -58,7 +59,7 @@ function _Paydown () {
   this.latest_calculated_interest_date = ''
   this.latest_payment_date = ''
   this.current_rate = ''
-  this.current_recurring_payment = ''
+  this.current_recurring_payment = null // null indicates that recurring data is missing or invalid
   this.current_principal = ''
   this.g_p_i_sum_of_interests = 0
   this.total_number_of_days = 0
@@ -69,6 +70,10 @@ function _Paydown () {
   this.latest_period_end_date = 0
   this.init = {}
   this.round_values = true
+  this.initial_fee = 0
+  this.sum_of_fees = 0
+  this.current_recurring_fee = 0
+  this.current_single_fee = 0
 /* // these 4 are for performance analysis:
   this.timeSpent = 0
   this.callCount = 0
@@ -79,7 +84,7 @@ function _Paydown () {
 
   this.round = function (input) {
 
-    if (typeof input !== 'number') {
+    if (typeof input !== 'number' || isNaN(input)) {
       throw new Error('this.round illegal parameter type')
     }
     if (this.round_values) {
@@ -138,7 +143,8 @@ function _Paydown () {
                         '-',
                         '-',
                         '-',
-                        this.round(principal)])
+                        this.round(principal),
+                        '-'])
     }
 
     if( this.debug_logging_enabled ) {
@@ -172,7 +178,8 @@ function _Paydown () {
                           '-',
                           '-',
                           '-',
-                          this.round(principal)])
+                          this.round(principal),
+                          '-'])
         rate_event = this.get_first_event_after_date('rate', rate_event_date, end_date)
         subperiod_start_date = rate_event_date
         if (rate_event) {
@@ -262,7 +269,7 @@ function _Paydown () {
     }
   }
 
-  this.handle_last_payment = function (reduction, date, period_interest) {
+  this.handle_last_payment = function (reduction, date, period_interest, fee = 0) {
     var installment
     // this.current_principal should be negative or zero here:
     reduction += this.current_principal
@@ -275,12 +282,13 @@ function _Paydown () {
                       installment,
                       this.round(reduction),
                       this.round(period_interest),
-                      0])
+                      0,
+                      this.round(fee)])
     this.current_principal = 0
     this.latest_payment_date = date
   }
 
-  this.func_pay_installment = function (index, date_obj, installment) {
+  this.func_pay_installment = function (index, date_obj, installment, fee = 0) {
     var period_interest
     var reduction
     var start_date, end_date
@@ -313,7 +321,7 @@ function _Paydown () {
     this.latest_payment_date = this.event_array[index].date
 
     if (this.current_principal <= 0) {
-      this.handle_last_payment(reduction, this.event_array[index].date, period_interest)
+      this.handle_last_payment(reduction, this.event_array[index].date, period_interest, fee)
       return false
     }
 
@@ -324,11 +332,12 @@ function _Paydown () {
                       this.round(reduction + period_interest),
                       this.round(reduction),
                       this.round(period_interest),
-                      this.round(this.current_principal)])
+                      this.round(this.current_principal),
+                      this.round(fee)])
     return true
   }
 
-  this.func_pay_reduction = function (index, date_obj, reduction) {
+  this.func_pay_reduction = function (index, date_obj, reduction, fee = 0) {
     var period_interest
 
     if (this.latest_calculated_interest_date === this.event_array[index].date) {
@@ -345,7 +354,7 @@ function _Paydown () {
     this.latest_payment_date = this.event_array[index].date
 
     if (this.current_principal <= 0) {
-      this.handle_last_payment(reduction, this.event_array[index].date, period_interest)
+      this.handle_last_payment(reduction, this.event_array[index].date, period_interest, fee)
       return false
     }
 
@@ -356,7 +365,8 @@ function _Paydown () {
                       this.round(reduction + period_interest),
                       this.round(reduction),
                       this.round(period_interest),
-                      this.round(this.current_principal)])
+                      this.round(this.current_principal),
+                      this.round(fee)])
     return true
   }
 
@@ -393,7 +403,7 @@ function _Paydown () {
     this.check_date(this.init.start_date, "start")
     this.check_date(this.init.end_date, "end")
 
-    if (this.init.amount !== null) {
+    if (this.current_recurring_payment !== null) {   // null indicates that recurring data is missing or invalid
       this.check_first_payment_date()
       this.generate_payment_events_till(this.init.end_date)
     }
@@ -412,31 +422,45 @@ function _Paydown () {
       throw new Error('invalid day count method: ' + this.init.day_count_method)
     }
 
-  // rewind start date by one so that the interest gets calculated from the very beginning:
+    // rewind start date by one so that the interest gets calculated from the very beginning:
     this.latest_calculated_interest_date = date_obj.set_current(this.init.start_date).get_prev()
     this.latest_period_end_date = this.latest_calculated_interest_date
     this.total_number_of_days = 0
     this.g_p_i_total_days = 0
 
-    // first line contains only the interest rate and principal:
+    // first line contains only the interest rate, principal and initial fee:
     this.log_payment([this.init.start_date,
                       this.init.rate,
                       '-',
                       '-',
                       '-',
-                      this.init.principal])
+                      this.init.principal,
+                      this.initial_fee])
 
     this.current_principal = this.init.principal
     this.current_rate = this.init.rate
-    this.current_recurring_payment = this.init.amount
+    this.sum_of_fees = this.initial_fee
 
     for (index = 0; index < this.event_array.length; index++) {
       // perf analysis:
       // this.mainLoopIterations++
       if (this.event_array[index].hasOwnProperty('recurring_amount')) {
         // recurring payment amount changes
-        if(this.init.amount === null) { throw new Error('Can\'t do recurring_amount: initial recurring data missing or invalid!') }
+        if(this.current_recurring_payment === null) { throw new Error('Can\'t do recurring_amount: initial recurring data missing or invalid!') }
         this.current_recurring_payment = this.event_array[index].recurring_amount
+      }
+
+      if (this.event_array[index].hasOwnProperty('recurring_fee_amount')) {
+        // recurring payment amount changes
+        if(this.current_recurring_payment === null) { throw new Error('Can\'t do recurring_fee_amount: initial recurring data missing or invalid!') }
+        this.current_recurring_fee = this.event_array[index].recurring_fee_amount
+      }
+
+      if (this.event_array[index].hasOwnProperty('pay_single_fee')) {
+        this.sum_of_fees += this.event_array[index].pay_single_fee
+        this.current_single_fee = this.event_array[index].pay_single_fee
+      } else {
+        this.current_single_fee = 0
       }
 
       if (this.event_array[index].hasOwnProperty('payment_method')) {
@@ -450,34 +474,48 @@ function _Paydown () {
       }
 
       if (this.event_array[index].hasOwnProperty('pay_recurring')) {
-        if(this.init.amount === null) { throw new Error('Can\'t do pay_recurring: initial recurring data missing or invalid!') }
+        if(this.current_recurring_payment === null) { throw new Error('Can\'t do pay_recurring: initial recurring data missing or invalid!') }
         // recurring payment transaction occurs
         if (this.init.payment_method === 'equal_installment') {
-          if (!this.func_pay_installment(index, date_obj, this.current_recurring_payment)) {
+          if (!this.func_pay_installment(index, date_obj, this.current_recurring_payment, this.current_recurring_fee)) {
             break
           }
         } else if (this.init.payment_method === 'equal_reduction') {
-          if (!this.func_pay_reduction(index, date_obj, this.current_recurring_payment)) {
+          if (!this.func_pay_reduction(index, date_obj, this.current_recurring_payment, this.current_recurring_fee)) {
             break
           }
         } else {
           throw new Error('invalid payment method: ' + this.init.payment_method)
         }
+        this.sum_of_fees += this.current_recurring_fee
+      }
+
+      if ( this.event_array[index].hasOwnProperty('pay_reduction') && this.event_array[index].hasOwnProperty('pay_installment') ) {
+        throw new Error('main loop error: event can not have more than one single payment on ' + this.event_array[index].date)
       }
 
       if (this.event_array[index].hasOwnProperty('pay_reduction')) {
         reduction = this.event_array[index].pay_reduction
 
-        if (!this.func_pay_reduction(index, date_obj, reduction)) {
+        if (!this.func_pay_reduction(index, date_obj, reduction, this.current_single_fee)) {
           break
         }
-      }
-
-      if (this.event_array[index].hasOwnProperty('pay_installment')) {
+      } else if (this.event_array[index].hasOwnProperty('pay_installment')) {
         installment = this.event_array[index].pay_installment
 
-        if (!this.func_pay_installment(index, date_obj, installment)) {
+        if (!this.func_pay_installment(index, date_obj, installment, this.current_single_fee)) {
           break
+        }
+      } else if ( this.current_single_fee ) {
+        if(!this.event_array[index].hasOwnProperty('ending')) {
+          this.log_payment([this.event_array[index].date,
+                            this.current_rate,
+                            '-',
+                            '-',
+                            '-',
+                            this.round(this.current_principal),
+                            this.round(this.current_single_fee)])
+          this.current_single_fee = 0
         }
       }
 
@@ -493,7 +531,8 @@ function _Paydown () {
                                 '-',
                                 '-',
                                 this.round(final_interest),
-                                this.round(this.current_principal)])
+                                this.round(this.current_principal),
+                                this.round(this.current_single_fee)])
               this.latest_calculated_interest_date = this.init.end_date
             } else {
               this.latest_calculated_interest_date = this.latest_payment_date
@@ -534,7 +573,8 @@ function _Paydown () {
             this.round(this.current_principal),
             this.latest_calculated_interest_date,
             this.latest_payment_date,
-            this.round(final_interest)]
+            this.round(final_interest),
+            this.round(this.sum_of_fees)]
   }
 
   this.set_init = function (data) {
@@ -555,17 +595,17 @@ function _Paydown () {
     }
 
     if (data.hasOwnProperty('recurring')) {
-      if( !data.recurring.hasOwnProperty('amount') || typeof data.recurring.amount !== 'number' || data.recurring.amount < 0) {
+      if( !data.recurring.hasOwnProperty('amount') || !number_is_valid(data.recurring.amount) ) {
         throw new Error('this.set_init: invalid or missing recurring amount')
       }
-      this.init.amount = data.recurring.amount
+      this.current_recurring_payment = data.recurring.amount
 
       if( !data.recurring.hasOwnProperty('first_payment_date') ) {
         throw new Error('this.set_init: missing first recurring payment date')
       }
       this.init.first_payment_date = data.recurring.first_payment_date
 
-      if( !data.recurring.hasOwnProperty('payment_day') || typeof data.recurring.payment_day !== 'number' || data.recurring.payment_day < 1 || data.recurring.payment_day > 31) {
+      if( !data.recurring.hasOwnProperty('payment_day') || typeof data.recurring.payment_day !== 'number' || data.recurring.payment_day < 1 || data.recurring.payment_day > 31 || isNaN(data.recurring.payment_day) ) {
         throw new Error('this.set_init: invalid or missing first payment day')
       }
       this.init.payment_day = data.recurring.payment_day
@@ -575,8 +615,14 @@ function _Paydown () {
       } else {
         this.init.payment_method = 'equal_installment'
         }
+      if( data.recurring.hasOwnProperty('payment_fee') ) {
+        if ( !number_is_valid(data.recurring.payment_fee) ) {
+        throw new Error('this.set_init: invalid recurring payment_fee')
+        }
+        this.current_recurring_fee = data.recurring.payment_fee
+      }
     } else {
-      this.init.amount = null
+      this.current_recurring_payment = null  // null indicates that recurring data is missing or invalid
     }
 
     if (data.hasOwnProperty('round_values')) {
@@ -590,6 +636,16 @@ function _Paydown () {
     } else {
       this.debug_logging_enabled = false
     }
+
+    if (data.hasOwnProperty('initial_fee')) {
+      if( !number_is_valid(data.initial_fee) ) {
+        throw new Error('this.set_init: invalid initial fee')
+      }
+      this.initial_fee = data.initial_fee
+    } else {
+      this.initial_fee = 0
+    }
+
   }
 
   this.check_and_add_event = function (event) {
@@ -600,26 +656,38 @@ function _Paydown () {
     this.check_date(event.date,"event")
 
     if (event.hasOwnProperty('rate')) {
-      if(typeof event.rate !== 'number' || event.rate < 0) {
+      if( !number_is_valid(event.rate) ) {
         throw new Error('this.check_and_add_event: invalid rate in event ' + event.date)
       }
     }
 
     if (event.hasOwnProperty('recurring_amount')) {
-      if(typeof event.recurring_amount !== 'number' || event.recurring_amount < 0) {
+      if( !number_is_valid(event.recurring_amount) ) {
         throw new Error('this.check_and_add_event: invalid recurring_amount in event ' + event.date)
       }
     }
 
     if (event.hasOwnProperty('pay_installment')) {
-      if(typeof event.pay_installment !== 'number' || event.pay_installment <= 0) {
+      if(typeof event.pay_installment !== 'number' || event.pay_installment <= 0 || isNaN(event.pay_installment) ) {
         throw new Error('this.check_and_add_event: invalid pay_installment in event ' + event.date)
       }
     }
 
     if (event.hasOwnProperty('pay_reduction')) {
-      if(typeof event.pay_reduction !== 'number' || event.pay_reduction <= 0) {
+      if(typeof event.pay_reduction !== 'number' || event.pay_reduction <= 0 || isNaN(event.pay_reduction)) {
         throw new Error('this.check_and_add_event: invalid pay_reduction in event ' + event.date)
+      }
+    }
+
+    if (event.hasOwnProperty('recurring_fee_amount')) {
+      if( !number_is_valid(event.recurring_fee_amount) ) {
+        throw new Error('this.check_and_add_event: invalid recurring_fee_amount in event ' + event.date)
+      }
+    }
+
+    if (event.hasOwnProperty('pay_single_fee')) {
+      if( !number_is_valid(event.pay_single_fee) ) {
+        throw new Error('this.check_and_add_event: invalid pay_single_fee in event ' + event.date)
       }
     }
 
@@ -674,9 +742,6 @@ function _Paydown () {
       event = { date: date_obj.get_current(), pay_recurring: true }
       this.add_event(event)
     }
-
-    // this is likely redundant and shouldn't be needed:
-    //this.event_array.sort(event_array_sorter)
   }
 
   this.check_events = function () {
@@ -922,6 +987,13 @@ function check_date_validity(date) {
     return false
   }
 
+  return true
+}
+
+function number_is_valid( n ) {
+  if(isNaN(n) || typeof n !== 'number' || n < 0) {
+    return false
+  }
   return true
 }
 
