@@ -14,6 +14,7 @@ Also available as an [NPM package](https://www.npmjs.com/package/paydown).
   - equal installment
   - equal principal reduction
 - freely settable rate changes and extra payments
+- optional calculation of payment fees
 ## Browser usage
 
 See [dist](https://github.com/jutunen/Paydown.js/tree/master/dist#browser-usage) directory.
