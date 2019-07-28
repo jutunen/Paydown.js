@@ -70,7 +70,7 @@ function _Paydown () {
   this.initial_fee = 0
   this.sum_of_fees = 0
   this.current_recurring_fee = 0
-  this.current_single_payment_fee = 0
+  this.current_single_fee = 0
 /* // these 4 are for performance analysis:
   this.timeSpent = 0
   this.callCount = 0
@@ -419,7 +419,7 @@ function _Paydown () {
       throw new Error('invalid day count method: ' + this.init.day_count_method)
     }
 
-  // rewind start date by one so that the interest gets calculated from the very beginning:
+    // rewind start date by one so that the interest gets calculated from the very beginning:
     this.latest_calculated_interest_date = date_obj.set_current(this.init.start_date).get_prev()
     this.latest_period_end_date = this.latest_calculated_interest_date
     this.total_number_of_days = 0
@@ -443,21 +443,21 @@ function _Paydown () {
       // this.mainLoopIterations++
       if (this.event_array[index].hasOwnProperty('recurring_amount')) {
         // recurring payment amount changes
-        if(this.current_recurring_payment === null) { throw new Error('Can\'t do recurring_amount: initial recurring data missing or invalid!') } // turha? käytä suoraan?
+        if(this.current_recurring_payment === null) { throw new Error('Can\'t do recurring_amount: initial recurring data missing or invalid!') }
         this.current_recurring_payment = this.event_array[index].recurring_amount
       }
 
-      if (this.event_array[index].hasOwnProperty('recurring_payment_fee')) {
+      if (this.event_array[index].hasOwnProperty('recurring_fee_amount')) {
         // recurring payment amount changes
-        if(this.current_recurring_payment === null) { throw new Error('Can\'t do recurring_payment_fee: initial recurring data missing or invalid!') } // turha? käytä suoraan?
-        this.current_recurring_fee = this.event_array[index].recurring_payment_fee
+        if(this.current_recurring_payment === null) { throw new Error('Can\'t do recurring_fee_amount: initial recurring data missing or invalid!') }
+        this.current_recurring_fee = this.event_array[index].recurring_fee_amount
       }
 
-      if (this.event_array[index].hasOwnProperty('single_payment_fee')) {
-        this.sum_of_fees += this.event_array[index].single_payment_fee
-        this.current_single_payment_fee = this.event_array[index].single_payment_fee
+      if (this.event_array[index].hasOwnProperty('pay_single_fee')) {
+        this.sum_of_fees += this.event_array[index].pay_single_fee
+        this.current_single_fee = this.event_array[index].pay_single_fee
       } else {
-        this.current_single_payment_fee = 0
+        this.current_single_fee = 0
       }
 
       if (this.event_array[index].hasOwnProperty('payment_method')) {
@@ -471,7 +471,7 @@ function _Paydown () {
       }
 
       if (this.event_array[index].hasOwnProperty('pay_recurring')) {
-        if(this.current_recurring_payment === null) { throw new Error('Can\'t do pay_recurring: initial recurring data missing or invalid!') } // turha? käytä suoraan?
+        if(this.current_recurring_payment === null) { throw new Error('Can\'t do pay_recurring: initial recurring data missing or invalid!') }
         // recurring payment transaction occurs
         if (this.init.payment_method === 'equal_installment') {
           if (!this.func_pay_installment(index, date_obj, this.current_recurring_payment, this.current_recurring_fee)) {
@@ -494,16 +494,16 @@ function _Paydown () {
       if (this.event_array[index].hasOwnProperty('pay_reduction')) {
         reduction = this.event_array[index].pay_reduction
 
-        if (!this.func_pay_reduction(index, date_obj, reduction, this.current_single_payment_fee)) {
+        if (!this.func_pay_reduction(index, date_obj, reduction, this.current_single_fee)) {
           break
         }
       } else if (this.event_array[index].hasOwnProperty('pay_installment')) {
         installment = this.event_array[index].pay_installment
 
-        if (!this.func_pay_installment(index, date_obj, installment, this.current_single_payment_fee)) {
+        if (!this.func_pay_installment(index, date_obj, installment, this.current_single_fee)) {
           break
         }
-      } else if ( this.current_single_payment_fee ) {
+      } else if ( this.current_single_fee ) {
         if(!this.event_array[index].hasOwnProperty('ending')) {
           this.log_payment([this.event_array[index].date,
                             this.current_rate,
@@ -511,8 +511,8 @@ function _Paydown () {
                             '-',
                             '-',
                             this.round(this.current_principal),
-                            this.round(this.current_single_payment_fee)])
-          this.current_single_payment_fee = 0
+                            this.round(this.current_single_fee)])
+          this.current_single_fee = 0
         }
       }
 
@@ -529,7 +529,7 @@ function _Paydown () {
                                 '-',
                                 this.round(final_interest),
                                 this.round(this.current_principal),
-                                this.round(this.current_single_payment_fee)])
+                                this.round(this.current_single_fee)])
               this.latest_calculated_interest_date = this.init.end_date
             } else {
               this.latest_calculated_interest_date = this.latest_payment_date
@@ -573,8 +573,6 @@ function _Paydown () {
             this.round(final_interest),
             this.round(this.sum_of_fees)]
   }
-
-  // function set_init
 
   this.set_init = function (data) {
 
@@ -678,15 +676,15 @@ function _Paydown () {
       }
     }
 
-    if (event.hasOwnProperty('recurring_payment_fee')) {
-      if( !number_is_valid(event.recurring_payment_fee) ) {
-        throw new Error('this.check_and_add_event: invalid recurring_payment_fee in event ' + event.date)
+    if (event.hasOwnProperty('recurring_fee_amount')) {
+      if( !number_is_valid(event.recurring_fee_amount) ) {
+        throw new Error('this.check_and_add_event: invalid recurring_fee_amount in event ' + event.date)
       }
     }
 
-    if (event.hasOwnProperty('single_payment_fee')) {
-      if( !number_is_valid(event.single_payment_fee) ) {
-        throw new Error('this.check_and_add_event: invalid single_payment_fee in event ' + event.date)
+    if (event.hasOwnProperty('pay_single_fee')) {
+      if( !number_is_valid(event.pay_single_fee) ) {
+        throw new Error('this.check_and_add_event: invalid pay_single_fee in event ' + event.date)
       }
     }
 
@@ -741,9 +739,6 @@ function _Paydown () {
       event = { date: date_obj.get_current(), pay_recurring: true }
       this.add_event(event)
     }
-
-    // this is likely redundant and shouldn't be needed:
-    //this.event_array.sort(event_array_sorter)
   }
 
   this.check_events = function () {
