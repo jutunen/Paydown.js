@@ -54,7 +54,7 @@ recurring_fee_amount|number|yes|New recurring payment fee amount|
 
 #### Passing events to the calculator instance
 
-Events are passed to calculator as an array of event objects. Event date based chronological order of event objects in the array is not required, calculator shall sort the events by itself.
+Events are passed to calculator as an array of event objects. Event date based chronological order of event objects in the array is not required, calculator shall sort the events by itself. Each event object must have a unique date, do not pass in objects with same dates.
 
 ### Calculation results
 
