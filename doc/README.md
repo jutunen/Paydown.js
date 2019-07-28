@@ -26,6 +26,7 @@ rate|number|no|Interest rate at the start date|
 day_count_method|string|yes|Determines how interest accrues over time|"act/360"<br>"act/365"|"act/360"
 round_values|boolean|yes|Sets output value rounding to 2 decimals|true<br>false|true
 debug_logging|boolean|yes|Enables debug logging|true<br>false|false
+initial_fee|number|yes|Loan establishment fee||0
 recurring|object|yes|Defines recurring payments|See below|
 
 #### Recurring object properties
@@ -36,6 +37,7 @@ amount|number|no|The amount of recurring payment||
 payment_method|string|yes|Payment method for recurring payments|"equal_installment"<br>"equal_reduction"|"equal_installment"
 first_payment_date|string|no|First recurring payment date|"dd.mm.yyyy"|
 payment_day|number|no|Monthly payment day of the recurring payment, applied after the month of the first payment date|1 - 31<br>31 equals to the last day of the month|
+payment_fee|number|yes|Recurring payment fee||0
 
 #### Event object properties
 
@@ -47,6 +49,8 @@ recurring_amount|number|yes|New recurring payment amount|
 pay_installment|number|yes|Individual installment payment|
 pay_reduction|number|yes|Individual principal reduction payment|
 payment_method|string|yes|New payment method|"equal_installment"<br>"equal_reduction"
+pay_single_fee|number|yes|Individual fee|
+recurring_fee_amount|number|yes|New recurring payment fee amount|
 
 #### Passing events to the calculator instance
 
@@ -90,3 +94,7 @@ Daily interests are calculated with following rules:
 ### "Interests only" recurring payments
 
 Recurring payments can be set to cover only the interests by creating an event with recurring_amount set to zero.
+
+### Fee calculation
+
+Fee calculation is optional and completely isolated from other payment calculations. Fee calculation doesn't have any effect on installment/reduction/interest/principal calculations.
