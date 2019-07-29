@@ -4,8 +4,10 @@ import './App.css';
 import Paydown from 'paydown'
 import { RawIO, Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, HamburgerMenu, get_new_id, date_obj_to_string  } from './AppComponents.js'
 import { connect } from 'react-redux';
-import { setStartDate, setEndDate, setRate, setPrincipal, setDayCountMethod, setRecurringPayment, setPaymentMethod, setFirstRecurringPaymentDate, setRecurringPaymentDay, clearAll, addEvent, deleteEvent, setEventDate, setEventRate, setEventReduction, setEventInstallment, setEventRecurringAmount, setEventPaymentMethod, importExample1, importExample2, importExample3, importExample4, toggleEventInclude, importFromFile, setTableTitle, toggleSummary, toggleRawIO, sortEventsByDate } from './actions.js';
+import { setStartDate, setEndDate, setRate, setPrincipal, setDayCountMethod, setRecurringPayment, setPaymentMethod, setFirstRecurringPaymentDate, setRecurringPaymentDay, clearAll, addEvent, deleteEvent, setEventDate, setEventRate, setEventReduction, setEventInstallment, setEventRecurringAmount, setEventPaymentMethod, importExample1, importExample2, importExample3, importExample4, toggleEventInclude, importFromFile, setTableTitle, toggleSummary, toggleRawIO, sortEventsByDate, setSinglePaymentFee, setRecurringPaymentFee, setInitFee, setInitRecurringPaymentFee, setRecurringPaymentPeriod } from './actions.js';
 import { ActionCreators } from 'redux-undo';
+import { initState } from './reducer.js';
+import * as cloneDeep from 'lodash.clonedeep';
 
 class App extends Component {
   constructor (props) {
@@ -68,6 +70,10 @@ class App extends Component {
       this.props.dispatch(setEventPaymentMethod(event_id, synthEvent.target.value))
     } else if (field_id === 7) { // included
       this.props.dispatch(toggleEventInclude(event_id))
+    } else if (field_id === 8) {
+      this.props.dispatch(setRecurringPaymentFee(event_id, synthEvent.target.value))
+    } else if (field_id === 9) {
+      this.props.dispatch(setSinglePaymentFee(event_id, synthEvent.target.value))
     }
 
   }
@@ -94,7 +100,7 @@ class App extends Component {
         this.props.dispatch(importExample4())
       }
     } else if (param === 4) {
-      this.clearAll()
+      this.props.dispatch(clearAll())
     } else if (param === 5) {
       this.props.dispatch(toggleRawIO())
     } else if (param === 6) {
@@ -150,7 +156,7 @@ class App extends Component {
       if(match_array)
         {
         let stateFromFile = replace_XML_entities(match_array[3]);
-        let stateAsObj = JSON.parse(stateFromFile)
+        let stateAsObj = Object.assign(cloneDeep(initState), JSON.parse(stateFromFile))
         fixObjDates(stateAsObj)
         fixObjTableTitle(stateAsObj)
         if(stateAsObj.events.length > 0) {
@@ -165,10 +171,6 @@ class App extends Component {
     } catch (e) {
         alert(e.message)
     }
-  }
-
-  clearAll (func) {
-    this.props.dispatch(clearAll())
   }
 
   handleInput (event, id) {
@@ -190,6 +192,12 @@ class App extends Component {
       this.props.dispatch(setFirstRecurringPaymentDate(event))
     } else if (id === 8) {
       this.props.dispatch(setRecurringPaymentDay(event.target.value))
+    } else if (id === 9) {
+      this.props.dispatch(setInitFee(event.target.value))
+    } else if (id === 10) {
+      this.props.dispatch(setInitRecurringPaymentFee(event.target.value))
+    } else if (id === 11) {
+      this.props.dispatch(setRecurringPaymentPeriod(event.target.value))
     }
     ReactTooltip.hide()
   }
@@ -221,6 +229,12 @@ class App extends Component {
       if (is_numeric(this.props.events[i].pay_reduction)) {
         obj.pay_reduction = Number(this.props.events[i].pay_reduction)
       }
+      if (is_numeric(this.props.events[i].single_payment_fee)) {
+        obj.pay_single_fee = Number(this.props.events[i].single_payment_fee)
+      }
+      if (is_numeric(this.props.events[i].recurring_payment_fee)) {
+        obj.recurring_fee_amount = Number(this.props.events[i].recurring_payment_fee)
+      }
       if (this.props.events[i].payment_method) {
         obj.payment_method = this.props.events[i].payment_method
       }
@@ -250,6 +264,7 @@ class App extends Component {
     this.input_data.principal = Number(this.props.principal)
     this.input_data.rate = Number(this.props.rate)
     this.input_data.day_count_method = this.props.dayCountMethod
+    this.input_data.initial_fee = Number(this.props.initFee)
 
     this.input_data.recurring.payment_method = this.props.paymentMethod
     if(this.props.firstPaymentDate instanceof Date) {
@@ -258,6 +273,8 @@ class App extends Component {
       this.input_data.recurring.first_payment_date = '';
     }
     this.input_data.recurring.payment_day = Number(this.props.recurringPaymentDay)
+    this.input_data.recurring.payment_period = Number(this.props.recurringPaymentPeriod)
+    this.input_data.recurring.payment_fee = Number(this.props.recurringPaymentFee)
     if(is_numeric(this.props.recurringPayment)) {
       this.input_data.recurring.amount = Number(this.props.recurringPayment)
     } else {
@@ -325,7 +342,7 @@ class App extends Component {
   }
 }
 
-function is_numeric (n) {
+export function is_numeric (n) {
   return !isNaN(parseFloat(n)) && isFinite(n)
 }
 

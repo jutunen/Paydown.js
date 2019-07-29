@@ -1,5 +1,5 @@
 
-import { SET_START_DATE, SET_END_DATE, SET_RATE, SET_PRINCIPAL, SET_PAYMENT_METHOD, SET_DAY_COUNT_METHOD, SET_RECURRING_PAYMENT, SET_RECURRING_PAYMENT_DAY, SET_FIRST_RECURRING_PAYMENT_DATE, CLEAR_ALL, ADD_EVENT, DELETE_EVENT, SET_EVENT_DATE, SET_EVENT_RATE, SET_EVENT_REDUCTION, SET_EVENT_INSTALLMENT, SET_EVENT_PAYMENT_METHOD, SET_EVENT_RECURRING_AMOUNT, IMPORT_EXAMPLE_1, IMPORT_EXAMPLE_2, IMPORT_EXAMPLE_3, IMPORT_EXAMPLE_4, TOGGLE_EVENT_INCLUDE, IMPORT_FROM_FILE, SET_TABLE_TITLE, TOGGLE_SUMMARY, TOGGLE_RAWIO, SORT_EVENTS_BY_DATE } from './actions.js';
+import { SET_START_DATE, SET_END_DATE, SET_RATE, SET_PRINCIPAL, SET_PAYMENT_METHOD, SET_DAY_COUNT_METHOD, SET_RECURRING_PAYMENT, SET_RECURRING_PAYMENT_DAY, SET_FIRST_RECURRING_PAYMENT_DATE, CLEAR_ALL, ADD_EVENT, DELETE_EVENT, SET_EVENT_DATE, SET_EVENT_RATE, SET_EVENT_REDUCTION, SET_EVENT_INSTALLMENT, SET_EVENT_PAYMENT_METHOD, SET_EVENT_RECURRING_AMOUNT, IMPORT_EXAMPLE_1, IMPORT_EXAMPLE_2, IMPORT_EXAMPLE_3, IMPORT_EXAMPLE_4, TOGGLE_EVENT_INCLUDE, IMPORT_FROM_FILE, SET_TABLE_TITLE, TOGGLE_SUMMARY, TOGGLE_RAWIO, SORT_EVENTS_BY_DATE, SET_INIT_FEE, SET_EVENT_RECURRING_PAYMENT_FEE, SET_EVENT_SINGLE_PAYMENT_FEE, SET_INIT_RECURRING_PAYMENT_FEE, SET_RECURRING_PAYMENT_PERIOD } from './actions.js';
 import { funcImportBasic, funcImportAdvanced, funcImportNoRecurringPayments, funcImportInterestsOnlyPayments } from './AppExamples.js'
 import { get_new_id  } from './AppComponents.js'
 import * as cloneDeep from 'lodash.clonedeep';
@@ -14,6 +14,9 @@ export const initState = {
   paymentMethod: 'equal_installment',
   firstPaymentDate: null,
   recurringPaymentDay: 1,
+  initFee: '',
+  recurringPaymentFee: '',
+  recurringPaymentPeriod: 1,
   events: [],
   tableTitle: '',
   showSummary: false,
@@ -52,6 +55,8 @@ export function reducer(state = initState, action) {
               pay_installment: '',
               pay_reduction: '',
               payment_method: '',
+              single_payment_fee: '',
+              recurring_payment_fee: '',
               included: true
             }
           ]
@@ -102,6 +107,18 @@ export function reducer(state = initState, action) {
       events_clone[index].included = !events_clone[index].included
       return Object.assign({}, state, { events: events_clone } )
 
+    case SET_EVENT_RECURRING_PAYMENT_FEE:
+      events_clone = cloneDeep(state.events)
+      index = events_clone.findIndex(x => x.id === action.id)
+      events_clone[index].recurring_payment_fee = action.value
+      return Object.assign({}, state, { events: events_clone } )
+
+    case SET_EVENT_SINGLE_PAYMENT_FEE:
+      events_clone = cloneDeep(state.events)
+      index = events_clone.findIndex(x => x.id === action.id)
+      events_clone[index].single_payment_fee = action.value
+      return Object.assign({}, state, { events: events_clone } )
+
     case SET_START_DATE:
       return Object.assign({}, state, { startDate: action.value })
 
@@ -128,6 +145,15 @@ export function reducer(state = initState, action) {
 
     case SET_RECURRING_PAYMENT_DAY:
       return Object.assign({}, state, { recurringPaymentDay: action.value })
+
+    case SET_RECURRING_PAYMENT_PERIOD:
+      return Object.assign({}, state, { recurringPaymentPeriod: action.value })
+
+    case SET_INIT_RECURRING_PAYMENT_FEE:
+      return Object.assign({}, state, { recurringPaymentFee: action.value })
+
+    case SET_INIT_FEE:
+      return Object.assign({}, state, { initFee: action.value })
 
     case CLEAR_ALL:
       return Object.assign({}, initState)

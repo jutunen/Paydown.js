@@ -1,3 +1,4 @@
+
 import React, { Component, PureComponent } from 'react';
 import ReactTooltip from 'react-tooltip';
 import DatePicker from 'react-datepicker';
@@ -9,6 +10,7 @@ import './react-datepicker.css';
 import './App.css';
 import delButton from './delete-button.png';
 import menuButton from './hamburger-icon.png';
+import { is_numeric } from './App.js';
 
 export function Form (props) {
   return (
@@ -105,6 +107,7 @@ export function Form (props) {
       <ReactTooltip id='firstPaymentDate' effect='solid' delayShow={350}>
         <span>First recurring payment date</span>
       </ReactTooltip>
+
       <div data-tip data-for='recurringPaymentDay' className='init_data'>
         Recurring payment day &nbsp;
         <select name="recurringPaymentDay" value={props.values.recurringPaymentDay} onChange={x => props.callback(x, 8)}>
@@ -144,6 +147,43 @@ export function Form (props) {
       <ReactTooltip id='recurringPaymentDay' effect='solid' delayShow={350}>
         <span>Monthly payment day of the recurring payment</span>
       </ReactTooltip>
+
+      <div data-tip data-for='recurringPaymentPeriod' className='init_data'>
+        Recurring payment period in months &nbsp;
+        <select name="recurringPaymentPeriod" value={props.values.recurringPaymentPeriod} onChange={x => props.callback(x, 11)}>
+          <option value='1'>1</option>
+          <option value='2'>2</option>
+          <option value='3'>3</option>
+          <option value='4'>4</option>
+          <option value='5'>5</option>
+          <option value='6'>6</option>
+          <option value='7'>7</option>
+          <option value='8'>8</option>
+          <option value='9'>9</option>
+          <option value='10'>10</option>
+          <option value='11'>11</option>
+          <option value='12'>12</option>
+        </select>
+      </div>
+      <ReactTooltip id='recurringPaymentPeriod' effect='solid' delayShow={350}>
+        <span>Recurring payment period length</span>
+      </ReactTooltip>
+
+      <div data-tip data-for='rec_fee' className='init_data'>
+        Recurring payment fee &nbsp;
+        <input name="recurringPaymentFee" value={props.values.recurringPaymentFee} onChange={x => props.callback(x, 10)} type='text' className='amount_input_wide' maxLength='10' />
+      </div>
+      <ReactTooltip id='rec_fee' effect='solid' delayShow={350}>
+        <span>Recurring payment fee</span>
+      </ReactTooltip>
+
+      <div data-tip data-for='init_fee' className='init_data'>
+        Initial fee &nbsp;
+        <input name="initFee" value={props.values.initFee} onChange={x => props.callback(x, 9)} type='text' className='amount_input_wide' maxLength='10' />
+      </div>
+      <ReactTooltip id='init_fee' effect='solid' delayShow={350}>
+        <span>Loan establishment fee</span>
+      </ReactTooltip>
     </div>
   )
 }
@@ -180,11 +220,19 @@ export function Summary (props) {
       <div className='output_value'>
         Unpaid interest: {props.values.unpaid_interest}
       </div>
+      <div className='output_value'>
+        Sum of fees: {props.values.sum_of_fees}
+      </div>
     </div>
   )
 }
 
 function TableRow (props) {
+
+  if(!is_numeric(props[6])) {
+    props[6] = 0
+  }
+
   return (
     <tr key={get_new_id()}>
       <td>{ props[0] }</td>
@@ -193,6 +241,7 @@ function TableRow (props) {
       <td>{ props[3] }</td>
       <td>{ props[4] }</td>
       <td>{ props[5] }</td>
+      <td>{ props[6] }</td>
     </tr>
   )
 }
@@ -307,6 +356,7 @@ export function Table (props) {
               <td>Reduction</td>
               <td>Interest</td>
               <td>Principal</td>
+              <td>Fee</td>
             </tr>
             {props.values.map(TableRow)}
             <tr className='bold_class'>
@@ -316,6 +366,7 @@ export function Table (props) {
               <td>{props.sums.sum_of_reductions}</td>
               <td>{props.sums.sum_of_interests}</td>
               <td>-</td>
+              <td>{props.sums.sum_of_fees}</td>
             </tr>
           </tbody>
         </table>
@@ -395,7 +446,7 @@ function DownShiftSelect(props) {
       }) => (
         <div>
           <button {...getToggleButtonProps()} >Import example</button>
-          <ul {...getMenuProps()} style={{listStyleType:'none',position:'absolute',top:'40px',left:'125px',zIndex:'1'}}>
+          <ul {...getMenuProps()} style={{listStyleType:'none',position:'absolute',top:'40px',left:'180px',zIndex:'1'}}>
             {isOpen
               ? items
                   .map((item, index) => (
@@ -530,6 +581,14 @@ class CalcEvent extends Component {
               <option value='equal_reduction'>Eq.Red.</option>
             </select>
           </div>
+          <div className='event_data'>
+            <div className='event_descriptor'>New recurring payment fee</div>
+            <input name='eventRecurringPaymentFee' disabled={!this.props.included} type='text' value={this.props.values.recurring_payment_fee} onChange={x => this.props.callback(x, this.props.values.id, 8)} className='amount_input' maxLength='10' />
+          </div>
+          <div className='event_data'>
+            <div className='event_descriptor'>Single fee</div>
+            <input name='eventSinglePaymentFee' disabled={!this.props.included} type='text' value={this.props.values.single_payment_fee} onChange={x => this.props.callback(x, this.props.values.id, 9)} className='amount_input' maxLength='10' />
+          </div>
         </div>
         <div className='event_data'>
           <input type='image' name="eventRemove" src={delButton} alt='Remove' height='25' width='25' onClick={x => this.props.callback(x, this.props.values.id, 5)} onMouseEnter={this.highLightEvent} onMouseLeave={this.unhighLightEvent} />
@@ -587,6 +646,8 @@ export class Events extends PureComponent {
 
     if(this.props.values.length === 0) {
       this.disableResizing()
+    } else {
+      this.enableResizing()
     }
   }
 
@@ -638,7 +699,7 @@ export function RemoveButton (props) {
 // this is just to keep the menu open on undo/redo clicks:
 function stateReducer(state, changes)
 {
-  if( ( changes.inputValue === 'Undo' || changes.inputValue === 'Redo' ) && ( changes.type === "__autocomplete_click_item__" || changes.type === "__autocomplete_keydown_enter__" ) ) {
+  if( ( changes.inputValue === 'Undo' || changes.inputValue === 'Redo' ) && ( changes.type === Downshift.stateChangeTypes.clickItem || changes.type === Downshift.stateChangeTypes.keyDownEnter ) ) {
     return {
       ...changes,
       isOpen: true

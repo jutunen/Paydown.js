@@ -26,6 +26,11 @@ export const SET_TABLE_TITLE = 'SET_TABLE_TITLE'
 export const TOGGLE_SUMMARY = 'TOGGLE_SUMMARY'
 export const TOGGLE_RAWIO = 'TOGGLE_RAWIO'
 export const SORT_EVENTS_BY_DATE = 'SORT_EVENTS_BY_DATE'
+export const SET_INIT_FEE = 'SET_INIT_FEE'
+export const SET_EVENT_RECURRING_PAYMENT_FEE = 'SET_EVENT_RECURRING_PAYMENT_FEE'
+export const SET_EVENT_SINGLE_PAYMENT_FEE = 'SET_EVENT_SINGLE_PAYMENT_FEE'
+export const SET_INIT_RECURRING_PAYMENT_FEE = 'SET_INIT_RECURRING_PAYMENT_FEE'
+export const SET_RECURRING_PAYMENT_PERIOD = 'SET_RECURRING_PAYMENT_PERIOD'
 
 export function setStartDate(value) {
   return { type: SET_START_DATE, value }
@@ -137,4 +142,24 @@ export function toggleRawIO () {
 
 export function sortEventsByDate () {
   return { type: SORT_EVENTS_BY_DATE }
+}
+
+export function setInitFee (value) {
+  return { type: SET_INIT_FEE, value }
+}
+
+export function setRecurringPaymentFee (id, value) {
+  return { type: SET_EVENT_RECURRING_PAYMENT_FEE, id, value }
+}
+
+export function setSinglePaymentFee (id, value) {
+  return { type: SET_EVENT_SINGLE_PAYMENT_FEE, id, value }
+}
+
+export function setInitRecurringPaymentFee (value) {
+  return { type: SET_INIT_RECURRING_PAYMENT_FEE, value }
+}
+
+export function setRecurringPaymentPeriod (value) {
+  return { type: SET_RECURRING_PAYMENT_PERIOD, value }
 }

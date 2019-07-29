@@ -54,7 +54,7 @@ div.event_inclusion_container{
   display:flex;
   flex-direction: row;
   justify-content: space-around;
-  width: 720px;
+  width: 900px;
 }
 
 .event-transition-enter {
@@ -81,7 +81,7 @@ div.event_exclusion_container{
   display:flex;
   flex-direction: row;
   justify-content: space-around;
-  width: 720px;
+  width: 900px;
   opacity: 0.5;
 }
 
@@ -89,7 +89,7 @@ div.event_container{
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  width: 840px;
+  width: 1020px;
   height: 72px;
   background-color: #f2f2f2;
   padding: 3px 0px;
@@ -140,7 +140,7 @@ label.event_checkbox_container:hover{
 div#heading_container{
   display: flex;
   flex-direction: column;
-  width: 880px;
+  width: 1060px;
   background-color: lightgrey;
   margin: auto;
 }
@@ -150,7 +150,7 @@ div#heading_content{
   flex-wrap: wrap;
   justify-content: center;
   position: relative;
-  width: 840px;
+  width: 1020px;
   background-color: #f2f2f2;
   margin-top: 20px;
   margin-left: 20px;
@@ -270,7 +270,7 @@ div.highlight_container{
 div.calc_container{
   display: flex;
   flex-direction: column;
-  width: 880px;
+  width: 1060px;
   margin:auto;
   background-color: lightgrey;
   padding-bottom: 23px;
@@ -290,7 +290,7 @@ div#output_summary_container{
   flex-wrap: wrap;
   justify-content: center;
   position: relative;
-  width: 840px;
+  width: 1020px;
   background-color: #f2f2f2;
   margin: 0px 20px 20px 20px;
   padding-bottom: 10px;
@@ -302,7 +302,7 @@ div#raw_input_container{
   flex-direction: column;
   justify-content: center;
   position: relative;
-  width: 820px;
+  width: 1000px;
   background-color: #f2f2f2;
   margin: 0px 20px 20px 20px;
   padding: 10px;
@@ -345,7 +345,7 @@ div.init_data_container{
   flex-wrap: wrap;
   justify-content: center;
   position: relative;
-  width: 840px;
+  width: 1020px;
   background-color: #f2f2f2;
   margin-top: 20px;
   margin-left: 20px;
@@ -358,7 +358,7 @@ div#buttons_container{
   justify-content: space-around;
   align-items: center;
   position: relative;
-  width: 840px;
+  width: 1020px;
   background-color: #f2f2f2;
   margin: 20px;
   padding: 3px 0px;
