@@ -70,10 +70,11 @@ days_calculated|number|Number of days calculated
 actual_end_date|string|Actual calculation end date ( "dd.mm.yyyy" )
 latest_payment_date|string|Latest payment date ( "dd.mm.yyyy" )
 unpaid_interest|number|Interests accrued after latest payment date ( within calculation period )
+sum_of_fees|number|Total sum of fees during calculation period
 
 If Paydown.calculate method is provided with an array as its 3rd argument, the array contents are interpreted as follows:
 
-    [ date, interest rate, installment, principal reduction, interest, remaining principal ]
+    [ date, interest rate, installment, principal reduction, interest, remaining principal, fee ]
 
 ### Debug logging
 
@@ -97,4 +98,4 @@ Recurring payments can be set to cover only the interests by creating an event w
 
 ### Fee calculation
 
-Fee calculation is optional and completely isolated from other payment calculations. Fee calculation doesn't have any effect on installment/reduction/interest/principal calculations.
+Fee calculation is optional and completely isolated from other payment calculations. Fee calculation doesn't have any effect on installment / reduction / interest / principal calculations.
