@@ -73,6 +73,7 @@ function _Paydown () {
   this.sum_of_fees = 0
   this.current_recurring_fee = 0
   this.current_single_fee = 0
+  this.recurring_payment_period = 1 // period in months
 /* // these 4 are for performance analysis:
   this.timeSpent = 0
   this.callCount = 0
@@ -371,7 +372,6 @@ function _Paydown () {
 
   this.calculate_to_date = function (array_of_events, array_of_debug_prints) {
     var index
-    var period_interest
     var reduction, installment
     var final_interest = 0
 
@@ -619,6 +619,12 @@ function _Paydown () {
         throw new Error('this.set_init: invalid recurring payment_fee')
         }
         this.current_recurring_fee = data.recurring.payment_fee
+      }
+      if( data.recurring.hasOwnProperty('payment_period') ) {
+        if ( !number_is_valid(data.recurring.payment_period) || data.recurring.payment_period > 12 ) {
+        throw new Error('this.set_init: invalid recurring payment_period')
+        }
+        this.recurring_payment_period = data.recurring.payment_period
         }
     } else {
       this.current_recurring_payment = null  // null indicates that recurring data is missing or invalid
@@ -731,13 +737,11 @@ function _Paydown () {
   this.generate_payment_events_till = function (date) {
 
     var date_obj = new _Days(this.init.first_payment_date)
-    var event
-
-    event = { date: date_obj.get_current(), pay_recurring: true }
+    var event = { date: date_obj.get_current(), pay_recurring: true }
 
     this.add_event(event)
 
-    while (date_to_integer(date_obj.get_next_month_nth_day(this.init.payment_day)) <= date_to_integer(date)) {
+    while (date_to_integer(date_obj.get_nth_month_nth_day(this.recurring_payment_period,this.init.payment_day)) <= date_to_integer(date)) {
       event = { date: date_obj.get_current(), pay_recurring: true }
       this.add_event(event)
     }
@@ -827,22 +831,20 @@ function _Days (init_date) {
     return zero_fill(this.day) + '.' + zero_fill(this.month) + '.' + this.year
   }
 
-  this.get_next_month_nth_day = function (day_number) {
-    if (day_number == 31 || (this.month === 1 && Number(day_number) > 28)) {
+  this.get_nth_month_nth_day = function (period_in_months, day_number) {
+    if (period_in_months === 1 && (day_number === 31 || (this.month === 1 && day_number > 28 ))) {
       return this.get_next_month_last_day()
     }
 
-    var next_month = this.month
+    var next_month = this.month + period_in_months
     var year = this.year
 
-    if (next_month == 12) {
-      next_month = 1
+    if (next_month > 12) {
+      next_month = next_month - 12
       ++year
-    } else {
-      ++next_month
     }
 
-    this.day = day_number
+    this.day = day_number === 31 ? days_in_month(next_month, year) : day_number
     this.month = next_month
     this.year = year
 
@@ -853,7 +855,7 @@ function _Days (init_date) {
     var next_month = this.month
     var year = this.year
 
-    if (next_month == 12) {
+    if (next_month === 12) {
       next_month = 1
       ++year
     } else {
@@ -943,7 +945,7 @@ function is_numeric (n) {
 }
 
 function is_it_leap_year (year) {
-  return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)
+  return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0)
 }
 
 function days_in_month (month, year) {
