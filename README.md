@@ -7,6 +7,7 @@ Also available as an [NPM package](https://www.npmjs.com/package/paydown).
 - freely selectable calculation period
 - daily interest calculation
 - recurring payments
+- recurring payment period length setting 
 - day count methods supported:
   - act / 360
   - act / 365
@@ -40,7 +41,6 @@ See [doc](https://github.com/jutunen/Paydown.js/tree/master/doc#documentation) d
 - better input validation
 - better documentation
 - more day count methods
-- length setting of recurring payment period
 - loan term features
 - etc.
 
