@@ -149,7 +149,7 @@ export function Form (props) {
       </ReactTooltip>
 
       <div data-tip data-for='recurringPaymentPeriod' className='init_data'>
-        Recurring payment period in months &nbsp;
+        Recurring payment period &nbsp;
         <select name="recurringPaymentPeriod" value={props.values.recurringPaymentPeriod} onChange={x => props.callback(x, 11)}>
           <option value='1'>1</option>
           <option value='2'>2</option>
@@ -164,6 +164,7 @@ export function Form (props) {
           <option value='11'>11</option>
           <option value='12'>12</option>
         </select>
+        &nbsp;months
       </div>
       <ReactTooltip id='recurringPaymentPeriod' effect='solid' delayShow={350}>
         <span>Recurring payment period length</span>
@@ -171,7 +172,7 @@ export function Form (props) {
 
       <div data-tip data-for='rec_fee' className='init_data'>
         Recurring payment fee &nbsp;
-        <input name="recurringPaymentFee" value={props.values.recurringPaymentFee} onChange={x => props.callback(x, 10)} type='text' className='amount_input_wide' maxLength='10' />
+        <input name="recurringPaymentFee" value={props.values.recurringPaymentFee} onChange={x => props.callback(x, 10)} type='text' className='amount_input_narrow' maxLength='10' />
       </div>
       <ReactTooltip id='rec_fee' effect='solid' delayShow={350}>
         <span>Recurring payment fee</span>
@@ -179,7 +180,7 @@ export function Form (props) {
 
       <div data-tip data-for='init_fee' className='init_data'>
         Initial fee &nbsp;
-        <input name="initFee" value={props.values.initFee} onChange={x => props.callback(x, 9)} type='text' className='amount_input_wide' maxLength='10' />
+        <input name="initFee" value={props.values.initFee} onChange={x => props.callback(x, 9)} type='text' className='amount_input_narrow' maxLength='10' />
       </div>
       <ReactTooltip id='init_fee' effect='solid' delayShow={350}>
         <span>Loan establishment fee</span>
