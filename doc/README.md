@@ -38,7 +38,7 @@ payment_method|string|yes|Payment method for recurring payments|"equal_installme
 first_payment_date|string|no|First recurring payment date|"dd.mm.yyyy"|
 payment_day|number|no|Monthly payment day of the recurring payment, applied after the month of the first payment date|1 - 31<br>31 equals to the last day of the month|
 payment_fee|number|yes|Recurring payment fee||0
-payment_period|number|yes|Recurring payment period length in months|1-12|1
+payment_period|number|yes|Recurring payment period length in months|1 - 12|1
 
 #### Event object properties
 
