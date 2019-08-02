@@ -602,8 +602,8 @@ function _Paydown () {
       }
       this.init.first_payment_date = data.recurring.first_payment_date
 
-      if( !data.recurring.hasOwnProperty('payment_day') || typeof data.recurring.payment_day !== 'number' || data.recurring.payment_day < 1 || data.recurring.payment_day > 31 || isNaN(data.recurring.payment_day) ) {
-        throw new Error('this.set_init: invalid or missing first payment day')
+      if( !data.recurring.hasOwnProperty('payment_day') || !number_is_valid(data.recurring.payment_day) || data.recurring.payment_day < 1 || data.recurring.payment_day > 31 || !Number.isInteger(data.recurring.payment_day) ) {
+        throw new Error('this.set_init: invalid or missing first payment_day number')
       }
       this.init.payment_day = data.recurring.payment_day
 
@@ -619,7 +619,7 @@ function _Paydown () {
         this.current_recurring_fee = data.recurring.payment_fee
       }
       if( data.recurring.hasOwnProperty('payment_period') ) {
-        if ( !number_is_valid(data.recurring.payment_period) || data.recurring.payment_period > 12 ) {
+        if ( !number_is_valid(data.recurring.payment_period) || data.recurring.payment_period > 12 || !Number.isInteger(data.recurring.payment_period) ) {
         throw new Error('this.set_init: invalid recurring payment_period')
         }
         this.recurring_payment_period = data.recurring.payment_period
