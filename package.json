@@ -1,6 +1,6 @@
 {
   "name": "paydown",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Loan payment calculation library with advanced features",
   "main": "dist/paydown-node.js",
   "directories": {
