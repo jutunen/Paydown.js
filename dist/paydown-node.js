@@ -27,12 +27,22 @@ function Paydown () {
 
     if (init_obj.hasOwnProperty('round_values')) {
       if( init_obj.round_values ) {
-        sum_of_installments = func_round(Number(interests + reductions - final_interest))
+        sum_of_installments = func_round(interests + reductions - final_interest)
+        interests = func_round(interests)
+        reductions = func_round(reductions)
+        remaining_principal = func_round(remaining_principal)
+        final_interest = func_round(final_interest)
+        fees = func_round(fees)
       } else {
-        sum_of_installments = Number(interests + reductions - final_interest)
+        sum_of_installments = interests + reductions - final_interest
       }
-    } else {
-      sum_of_installments = func_round(Number(interests + reductions - final_interest))
+    } else { // round_values default value: true
+      sum_of_installments = func_round(interests + reductions - final_interest)
+      interests = func_round(interests)
+      reductions = func_round(reductions)
+      remaining_principal = func_round(remaining_principal)
+      final_interest = func_round(final_interest)
+      fees = func_round(fees)
     }
 
     return {
@@ -86,7 +96,7 @@ function _Paydown () {
       throw new Error('this.round illegal parameter type')
     }
     if (this.round_values) {
-      input = Math.round(input * 100) / 100
+      input = func_round(input)
     }
 
     return input
@@ -565,13 +575,13 @@ function _Paydown () {
     //console.log("this.rateEventIterations: " + this.rateEventIterations)
     //console.log("this.mainLoopIterations: " + this.mainLoopIterations)
 
-    return [this.round(this.sum_of_interests),
-            this.round(this.sum_of_reductions),
-            this.round(this.current_principal),
+    return [this.sum_of_interests,
+            this.sum_of_reductions,
+            this.current_principal,
             this.latest_calculated_interest_date,
             this.latest_payment_date,
-            this.round(final_interest),
-            this.round(this.sum_of_fees)]
+            final_interest,
+            this.sum_of_fees]
   }
 
   this.set_init = function (data) {
