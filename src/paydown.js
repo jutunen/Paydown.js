@@ -485,6 +485,7 @@ function _Paydown () {
 
       if (this.event_array[index].hasOwnProperty('pay_recurring')) {
         if(this.current_recurring_payment === null) { throw new Error('Can\'t do pay_recurring: initial recurring data missing or invalid!') }
+        this.sum_of_fees += this.current_recurring_fee
         // recurring payment transaction occurs
         if (this.init.payment_method === 'equal_installment') {
           if (!this.func_pay_installment(index, date_obj, this.current_recurring_payment, this.current_recurring_fee)) {
@@ -497,7 +498,6 @@ function _Paydown () {
         } else {
           throw new Error('invalid payment method: ' + this.init.payment_method)
         }
-        this.sum_of_fees += this.current_recurring_fee
       }
 
       if ( this.event_array[index].hasOwnProperty('pay_reduction') && this.event_array[index].hasOwnProperty('pay_installment') ) {
@@ -672,7 +672,7 @@ function _Paydown () {
     this.check_date(event.date,"event")
 
     if (event.hasOwnProperty('rate')) {
-      if( !number_is_valid(event.rate) ) {
+      if( isNaN(event.rate) || typeof event.rate !== 'number' ) {
         throw new Error('this.check_and_add_event: invalid rate in event ' + event.date)
       }
     }
