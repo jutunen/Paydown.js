@@ -1,7 +1,8 @@
 
 ## Documentation
 
-#### [Invoking the calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#invoking-the-calculation)
+[**Invoking the calculation**](https://github.com/jutunen/Paydown.js/tree/master/doc#invoking-the-calculation)
+
 &nbsp;&nbsp;[Method arguments](https://github.com/jutunen/Paydown.js/tree/master/doc#method-arguments)
 
 &nbsp;&nbsp;[Init_data object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#init_data-object-properties)
@@ -12,12 +13,17 @@
 
 &nbsp;&nbsp;[Passing events to the calculator instance](https://github.com/jutunen/Paydown.js/tree/master/doc#passing-events-to-the-calculator-instance)
 
-#### [Calculation results](https://github.com/jutunen/Paydown.js/tree/master/doc#calculation-results)
-#### [Debug logging](https://github.com/jutunen/Paydown.js/tree/master/doc#debug-logging)
-#### [Interest calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#interest-calculation)
-#### [Negative interest calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#negative-interest-calculation)
-#### ["Interests only" recurring payments](https://github.com/jutunen/Paydown.js/tree/master/doc#interests-only-recurring-payments)
-#### [Fee calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#fee-calculation)
+[**Calculation results**](https://github.com/jutunen/Paydown.js/tree/master/doc#calculation-results)
+
+[**Debug logging**](https://github.com/jutunen/Paydown.js/tree/master/doc#debug-logging)
+
+[**Interest calculation**](https://github.com/jutunen/Paydown.js/tree/master/doc#interest-calculation)
+
+[**Negative interest calculation**](https://github.com/jutunen/Paydown.js/tree/master/doc#negative-interest-calculation)
+
+[**"Interests only" recurring payments**](https://github.com/jutunen/Paydown.js/tree/master/doc#interests-only-recurring-payments)
+
+[**Fee calculation**](https://github.com/jutunen/Paydown.js/tree/master/doc#fee-calculation)
 
 <br/><br>
 
