@@ -426,7 +426,8 @@ function DownShiftSelect(props) {
     { value: 'Basic', tip: 'Example without events', id: 1 },
     { value: 'Advanced', tip: 'Example with 2 events', id: 2 },
     { value: 'No recurring payments', tip: 'Both payments in this<br />example are defined by events', id: 3 },
-    { value: 'Interests only payments', tip: 'Setting recurring amount to<br />zero enables interests only payments', id: 4 }
+    { value: 'Interests only payments', tip: 'Setting recurring amount to<br />zero enables interests only payments', id: 4 },
+    { value: 'Negative interest', tip: 'Example with negative interest', id: 5 }
   ]
 
   return (

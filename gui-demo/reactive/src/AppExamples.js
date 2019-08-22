@@ -164,3 +164,51 @@ export function funcImportInterestsOnlyPayments (get_new_id) {
     obj.events.push(event_2)
     return obj
   }
+
+export function funcImportNegativeRate (get_new_id) {
+    var obj = {}
+    obj.startDate = new Date(2019,0,1)
+    obj.endDate = new Date(2025,0,1)
+    obj.principal = '100000'
+    obj.rate = '-1'
+    obj.dayCountMethod ='act/365'
+    obj.recurringPayment ='5000'
+    obj.paymentMethod ='equal_reduction'
+    obj.firstPaymentDate = new Date(2019,0,31)
+    obj.recurringPaymentDay = 31
+    obj.tableTitle = 'Negative interest example'
+    obj.showSummary = false
+    obj.showRawIO = false
+    obj.events = []
+    obj.recurringPaymentFee = 0
+    obj.recurringPaymentPeriod = 1
+    obj.initFee = 0
+
+    var event = {}
+    event.date = new Date(2019,6,1)
+    event.rate = '1'
+    event.recurring_amount = ''
+    event.pay_reduction = ''
+    event.pay_installment = ''
+    event.payment_method = ''
+    event.id = get_new_id()
+    event.included = true
+    event.single_payment_fee = ''
+    event.recurring_payment_fee = ''
+
+    var event_2 = {}
+    event_2.date = new Date(2020,0,1)
+    event_2.pay_reduction = ''
+    event_2.recurring_amount = ''
+    event_2.pay_installment = ''
+    event_2.payment_method = ''
+    event_2.rate = '-1'
+    event_2.id = get_new_id()
+    event_2.included = true
+    event_2.single_payment_fee = ''
+    event_2.recurring_payment_fee = ''
+
+    obj.events.push(event)
+    obj.events.push(event_2)
+    return obj
+  }

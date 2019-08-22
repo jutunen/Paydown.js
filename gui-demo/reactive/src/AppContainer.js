@@ -11,10 +11,13 @@ import App from './App.js'
 function Apps (props) {
   return (
     <>
+    <div id='app_container'>
       {props.ids.map( (value) => {
         return <ReduxApp key={value} id={value} removable={props.ids.length > 1 ? true : false} removerCb={props.removerCb} stateGetterCb={props.stateGetterCb} initState={props.initState} />
         })
       }
+    </div>
+    <Duplicator callback={props.callback} visible={props.visible > 1 ? false : true} />
     </>
   )
 }
@@ -72,12 +75,7 @@ class AppContainer extends Component {
 
   render () {
     return (
-      <>
-      <div id='app_container'>
-        <Apps ids={this.state.appIds} removerCb={this.removeApp} stateGetterCb={this.getStateGetterFunction} initState={this.copyOfState}/>
-      </div>
-      <Duplicator callback={this.duplicateApp} visible={this.state.appIds.length > 1 ? false : true} />
-      </>
+      <Apps ids={this.state.appIds} removerCb={this.removeApp} stateGetterCb={this.getStateGetterFunction} initState={this.copyOfState} callback={this.duplicateApp} visible={this.state.appIds.length} />
     )
   }
 }

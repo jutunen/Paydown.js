@@ -4,7 +4,7 @@ import './App.css';
 import Paydown from 'paydown'
 import { RawIO, Form, Summary, Table, ErrorMsg, Buttons, Events, RemoveButton, HamburgerMenu, get_new_id, date_obj_to_string  } from './AppComponents.js'
 import { connect } from 'react-redux';
-import { setStartDate, setEndDate, setRate, setPrincipal, setDayCountMethod, setRecurringPayment, setPaymentMethod, setFirstRecurringPaymentDate, setRecurringPaymentDay, clearAll, addEvent, deleteEvent, setEventDate, setEventRate, setEventReduction, setEventInstallment, setEventRecurringAmount, setEventPaymentMethod, importExample1, importExample2, importExample3, importExample4, toggleEventInclude, importFromFile, setTableTitle, toggleSummary, toggleRawIO, sortEventsByDate, setSinglePaymentFee, setRecurringPaymentFee, setInitFee, setInitRecurringPaymentFee, setRecurringPaymentPeriod } from './actions.js';
+import { setStartDate, setEndDate, setRate, setPrincipal, setDayCountMethod, setRecurringPayment, setPaymentMethod, setFirstRecurringPaymentDate, setRecurringPaymentDay, clearAll, addEvent, deleteEvent, setEventDate, setEventRate, setEventReduction, setEventInstallment, setEventRecurringAmount, setEventPaymentMethod, importExample1, importExample2, importExample3, importExample4, toggleEventInclude, importFromFile, setTableTitle, toggleSummary, toggleRawIO, sortEventsByDate, setSinglePaymentFee, setRecurringPaymentFee, setInitFee, setInitRecurringPaymentFee, setRecurringPaymentPeriod, importExample5 } from './actions.js';
 import { ActionCreators } from 'redux-undo';
 import { initState } from './reducer.js';
 import * as cloneDeep from 'lodash.clonedeep';
@@ -98,6 +98,8 @@ class App extends Component {
         this.props.dispatch(importExample3())
       } else if(synthEvent === 4) {
         this.props.dispatch(importExample4())
+      } else if(synthEvent === 5) {
+        this.props.dispatch(importExample5())
       }
     } else if (param === 4) {
       this.props.dispatch(clearAll())

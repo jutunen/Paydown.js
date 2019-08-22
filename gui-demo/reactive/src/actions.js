@@ -21,6 +21,7 @@ export const IMPORT_EXAMPLE_1 = 'IMPORT_EXAMPLE_1'
 export const IMPORT_EXAMPLE_2 = 'IMPORT_EXAMPLE_2'
 export const IMPORT_EXAMPLE_3 = 'IMPORT_EXAMPLE_3'
 export const IMPORT_EXAMPLE_4 = 'IMPORT_EXAMPLE_4'
+export const IMPORT_EXAMPLE_5 = 'IMPORT_EXAMPLE_5'
 export const IMPORT_FROM_FILE = 'IMPORT_FROM_FILE'
 export const SET_TABLE_TITLE = 'SET_TABLE_TITLE'
 export const TOGGLE_SUMMARY = 'TOGGLE_SUMMARY'
@@ -122,6 +123,10 @@ export function importExample3 () {
 
 export function importExample4 () {
   return { type: IMPORT_EXAMPLE_4 }
+}
+
+export function importExample5 () {
+  return { type: IMPORT_EXAMPLE_5 }
 }
 
 export function importFromFile (value) {
