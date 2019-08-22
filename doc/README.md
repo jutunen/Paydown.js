@@ -3,10 +3,15 @@
 
 #### [Invoking the calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#invoking-the-calculation)
 [Method arguments](https://github.com/jutunen/Paydown.js/tree/master/doc#method-arguments)
+
 [Init_data object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#init_data-object-properties)
+
 [Recurring object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#recurring-object-properties)
+
 [Event object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#event-object-properties)
+
 [Passing events to the calculator instance](https://github.com/jutunen/Paydown.js/tree/master/doc#passing-events-to-the-calculator-instance)
+
 #### [Calculation results](https://github.com/jutunen/Paydown.js/tree/master/doc#calculation-results)
 #### [Debug logging](https://github.com/jutunen/Paydown.js/tree/master/doc#debug-logging)
 #### [Interest calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#interest-calculation)
