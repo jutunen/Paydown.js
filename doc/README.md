@@ -1,6 +1,19 @@
 
 ## Documentation
 
+#### [Invoking the calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#invoking-the-calculation)
+[Method arguments](https://github.com/jutunen/Paydown.js/tree/master/doc#method-arguments)
+[Init_data object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#init_data-object-properties)
+[Recurring object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#recurring-object-properties)
+[Event object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#event-object-properties)
+[Passing events to the calculator instance](https://github.com/jutunen/Paydown.js/tree/master/doc#passing-events-to-the-calculator-instance)
+#### [Calculation results](https://github.com/jutunen/Paydown.js/tree/master/doc#calculation-results)
+#### [Debug logging](https://github.com/jutunen/Paydown.js/tree/master/doc#debug-logging)
+#### [Interest calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#interest-calculation)
+#### [Negative interest calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#negative-interest-calculation)
+#### ["Interests only" recurring payments](https://github.com/jutunen/Paydown.js/tree/master/doc#interests-only-recurring-payments)
+#### [Fee calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#fee-calculation)
+
 ### Invoking the calculation
 ```javascript
 Paydown.calculate(init_data, events, payments, debug_log)
@@ -92,6 +105,12 @@ Daily interests are calculated with following rules:
 - calculation start and end date interests are always included to the calculation completely
 - payment day interest is calculated from the capital before the payment
 - interest of the rate change day is calculated with the new rate
+
+### Negative interest calculation
+
+If payment method is equal reduction, the negative interest shall be compensated by subtracting the interest from the installment.
+
+If payment method is equal installment, the negative interest shall be compensated by adding the interest to the reduction.
 
 ### "Interests only" recurring payments
 
