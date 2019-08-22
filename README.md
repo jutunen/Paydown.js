@@ -6,6 +6,7 @@ Also available as an [NPM package](https://www.npmjs.com/package/paydown).
 ## Features
 - freely selectable calculation period
 - daily interest calculation
+- negative interest calculation
 - recurring payments
 - recurring payment period length setting 
 - day count methods supported:
