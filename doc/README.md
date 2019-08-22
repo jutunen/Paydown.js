@@ -2,15 +2,15 @@
 ## Documentation
 
 #### [Invoking the calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#invoking-the-calculation)
-[Method arguments](https://github.com/jutunen/Paydown.js/tree/master/doc#method-arguments)
+&nbsp;&nbsp;[Method arguments](https://github.com/jutunen/Paydown.js/tree/master/doc#method-arguments)
 
-[Init_data object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#init_data-object-properties)
+&nbsp;&nbsp;[Init_data object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#init_data-object-properties)
 
-[Recurring object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#recurring-object-properties)
+&nbsp;&nbsp;[Recurring object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#recurring-object-properties)
 
-[Event object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#event-object-properties)
+&nbsp;&nbsp;[Event object properties](https://github.com/jutunen/Paydown.js/tree/master/doc#event-object-properties)
 
-[Passing events to the calculator instance](https://github.com/jutunen/Paydown.js/tree/master/doc#passing-events-to-the-calculator-instance)
+&nbsp;&nbsp;[Passing events to the calculator instance](https://github.com/jutunen/Paydown.js/tree/master/doc#passing-events-to-the-calculator-instance)
 
 #### [Calculation results](https://github.com/jutunen/Paydown.js/tree/master/doc#calculation-results)
 #### [Debug logging](https://github.com/jutunen/Paydown.js/tree/master/doc#debug-logging)
@@ -18,6 +18,8 @@
 #### [Negative interest calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#negative-interest-calculation)
 #### ["Interests only" recurring payments](https://github.com/jutunen/Paydown.js/tree/master/doc#interests-only-recurring-payments)
 #### [Fee calculation](https://github.com/jutunen/Paydown.js/tree/master/doc#fee-calculation)
+
+<br/><br>
 
 ### Invoking the calculation
 ```javascript
@@ -119,7 +121,7 @@ If payment method is equal installment, the negative interest shall be compensat
 
 ### "Interests only" recurring payments
 
-Recurring payments can be set to cover only the interests by creating an event with recurring_amount set to zero.
+Recurring payments can be set to cover only the interests by setting recurring object property *amount* to zero or by creating an event with *recurring_amount* set to zero.
 
 ### Fee calculation
 
