@@ -1,9 +1,10 @@
 [![npm version](https://badge.fury.io/js/paydown.svg)](https://badge.fury.io/js/paydown)
 # Paydown.js
-Loan payment calculation library with advanced features. Demo available at http://paydowncalc.loan/
+Loan payment calculation library with advanced features. Demo available at http://135.181.40.67/paydowncalc/
 
 Also available as an [NPM package](https://www.npmjs.com/package/paydown).
 ## Features
+- fully leap year aware
 - freely selectable calculation period
 - daily interest calculation
 - negative interest calculation
